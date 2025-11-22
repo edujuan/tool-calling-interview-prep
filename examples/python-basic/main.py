@@ -7,6 +7,7 @@ Perfect for understanding the basics of tool-calling.
 
 import json
 import os
+import math
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -26,10 +27,23 @@ def calculator(expression: str) -> str:
         
     Returns:
         The result as a string, or an error message if evaluation fails
+    
+    Security Note: This uses eval() for simplicity in this educational example.
+    In production, use a safe math expression parser like py-expression-eval or numexpr.
     """
     try:
-        # Evaluate the expression safely (note: eval can be dangerous in production!)
-        result = eval(expression)
+        # Create a restricted namespace with only safe math functions
+        # This is safer than bare eval(), but still use a proper parser in production
+        safe_dict = {
+            "__builtins__": {},
+            "sqrt": math.sqrt,
+            "pow": math.pow,
+            "abs": abs,
+            "round": round,
+            "max": max,
+            "min": min,
+        }
+        result = eval(expression, safe_dict, {})
         return str(result)
     except Exception as e:
         return f"Error evaluating expression: {str(e)}"

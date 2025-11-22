@@ -171,6 +171,9 @@ The report includes:
 #### Tool 1: Load Dataset
 
 ```python
+import pandas as pd
+import json
+
 def load_dataset(filepath: str, file_type: str = "csv") -> str:
     """
     Load a dataset from file.
@@ -341,6 +344,9 @@ def query_data(operation: str, **kwargs) -> str:
 
 ```python
 import matplotlib.pyplot as plt
+import os
+import time
+import json
 
 def create_visualization(chart_type: str, **kwargs) -> str:
     """
@@ -435,6 +441,11 @@ def create_visualization(chart_type: str, **kwargs) -> str:
 #### Tool 5: Generate Report
 
 ```python
+import json
+import os
+from datetime import datetime
+import numpy as np
+
 def generate_report() -> str:
     """
     Generate a comprehensive analysis report.

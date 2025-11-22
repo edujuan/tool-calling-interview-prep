@@ -235,7 +235,7 @@ agent = ReactAgent(tools=tools)
 
 **External:**
 - [ReAct Paper](https://arxiv.org/abs/2210.03629)
-- [LangChain ReAct](https://python.langchain.com/docs/modules/agents/agent_types/react)
+- [LangChain ReAct](https://docs.langchain.com/docs/modules/agents/agent_types/react)
 
 ## Next Steps
 

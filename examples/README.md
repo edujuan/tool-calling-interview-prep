@@ -154,42 +154,62 @@ if response.choices[0].message.tool_calls:
 ### With LangChain
 
 ```python
-from langchain.agents import initialize_agent, Tool
-from langchain.llms import OpenAI
+from langchain.agents import create_react_agent, AgentExecutor
+from langchain_openai import ChatOpenAI
+from langchain.tools import Tool
+from langchain import hub
+import math
+
+# Safe calculator function
+def safe_calc(expression: str) -> str:
+    """Safely evaluate math expressions"""
+    try:
+        safe_dict = {"__builtins__": {}, "sqrt": math.sqrt}
+        return str(eval(expression, safe_dict, {}))
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 tools = [
     Tool(
         name="Calculator",
-        func=lambda x: str(eval(x)),
+        func=safe_calc,
         description="For math calculations"
     )
 ]
 
-agent = initialize_agent(
-    tools,
-    OpenAI(temperature=0),
-    agent="zero-shot-react-description"
-)
+# Create agent with modern LangChain API
+llm = ChatOpenAI(model="gpt-5-mini", temperature=0)
+prompt = hub.pull("hwchase17/react")
+agent = create_react_agent(llm, tools, prompt)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
-result = agent.run("What is 15 * 8?")
-print(result)
+result = agent_executor.invoke({"input": "What is 15 * 8?"})
+print(result["output"])
 ```
 
 ### UTCP Direct
 
 ```python
-from utcp import UTCPClient
+from utcp.utcp_client import UtcpClient
+import asyncio
 
-# Load tool manual
-client = UTCPClient()
-client.load_manual("./tools/weather.json")
+async def main():
+    # Create UTCP client with configuration
+    client = await UtcpClient.create(
+        config={
+            "manual_path": "./tools/weather.json"
+        }
+    )
+    
+    # Call tool (format: "manual_name.tool_name")
+    result = await client.call_tool(
+        "weather.get_weather",
+        {"location": "San Francisco"}
+    )
+    print(result)
 
-# Call tool
-result = client.call_tool(
-    "get_weather",
-    {"location": "San Francisco"}
-)
-print(result)
+# Run the async function
+asyncio.run(main())
 ```
 
 ### MCP Client
@@ -324,7 +344,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for details.
 ## 🔗 External Resources
 
 - [OpenAI Cookbook](https://cookbook.openai.com/)
-- [LangChain Examples](https://python.langchain.com/docs/use_cases/agents)
+- [LangChain Examples](https://docs.langchain.com/docs/use_cases/agents)
 - [UTCP Examples Repo](https://github.com/utcp-org/examples)
 - [MCP Servers Repo](https://github.com/modelcontextprotocol/servers)
 

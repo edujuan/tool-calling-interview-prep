@@ -229,7 +229,7 @@ Contributors will be:
 ### Project-Specific Resources
 - [UTCP Specification](https://www.utcp.io/)
 - [MCP Documentation](https://modelcontextprotocol.io/)
-- [LangChain Documentation](https://python.langchain.com/)
+- [LangChain Documentation](https://docs.langchain.com/)
 
 ## 🔄 Keeping Your Fork Updated
 

@@ -61,7 +61,7 @@ ASCII diagrams and visual representations covering:
 - [ReAct Paper (arXiv)](https://arxiv.org/abs/2210.03629) - Authoritative source on reasoning + acting agents
 - [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling) - Official function calling documentation
 - [Anthropic Claude Tool Use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) - Claude's tool use patterns
-- [LangChain Agent Documentation](https://python.langchain.com/docs/modules/agents/) - Framework-specific architectures
+- [LangChain Agent Documentation](https://docs.langchain.com/docs/modules/agents/) - Framework-specific architectures
 - [AWS AI/ML Security Best Practices](https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/security.html) - Production security patterns
 
 ---
@@ -189,7 +189,7 @@ Use the [architecture diagrams](diagrams/) to select the right pattern for your 
 ### Official Documentation
 - [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling)
 - [Anthropic Claude Tool Use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use)
-- [LangChain Agent Documentation](https://python.langchain.com/docs/modules/agents/)
+- [LangChain Agent Documentation](https://docs.langchain.com/docs/modules/agents/)
 
 ### Research Papers
 - [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)

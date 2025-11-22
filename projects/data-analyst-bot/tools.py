@@ -537,3 +537,4 @@ class DataAnalystTools:
         self.current_file = None
 
 
+

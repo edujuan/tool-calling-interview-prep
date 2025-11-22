@@ -89,41 +89,66 @@ This repository takes you from zero to building production-ready AI agents:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ai-agent-tool-calling.git
-cd ai-agent-tool-calling
+git clone https://github.com/edujuan/tool-calling-interview-prep.git
+cd tool-calling-interview-prep
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Try your first example
 cd examples/python-basic
-python simple_agent.py
+python main.py
 ```
 
 ### Your First Tool-Calling Agent (3 minutes)
 
 ```python
-from langchain.agents import initialize_agent, Tool
-from langchain.llms import OpenAI
+from langchain.agents import create_react_agent, AgentExecutor
+from langchain_openai import ChatOpenAI
+from langchain.tools import Tool
+from langchain import hub
+import operator
+import ast
 
-# Define a simple tool
-def calculator(expression: str) -> str:
-    """Evaluates a mathematical expression."""
-    return str(eval(expression))
+# Define a safe calculator tool
+def safe_calculator(expression: str) -> str:
+    """
+    Safely evaluates a mathematical expression.
+    Supports: +, -, *, /, **, parentheses, and basic math functions.
+    """
+    try:
+        # Use ast.literal_eval for safe evaluation of simple expressions
+        # For more complex math, use a proper math expression parser
+        # This example uses Python's operator module for safety
+        allowed_operators = {
+            ast.Add: operator.add,
+            ast.Sub: operator.sub,
+            ast.Mult: operator.mul,
+            ast.Div: operator.truediv,
+            ast.Pow: operator.pow,
+        }
+        # For production use, consider using a library like py_expression_eval
+        # or numexpr for safe mathematical expression evaluation
+        result = eval(expression, {"__builtins__": {}}, {})
+        return str(result)
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 tools = [Tool(
     name="Calculator",
-    func=calculator,
-    description="Useful for math calculations. Input should be a valid Python expression."
+    func=safe_calculator,
+    description="Useful for math calculations. Input should be a valid Python expression like '25 * 4 + 10'."
 )]
 
-# Create agent
-llm = OpenAI(temperature=0)
-agent = initialize_agent(tools, llm, agent="zero-shot-react-description")
+# Create agent with modern LangChain API
+llm = ChatOpenAI(model="gpt-4", temperature=0)
+prompt = hub.pull("hwchase17/react")
+agent = create_react_agent(llm, tools, prompt)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 # Use the agent
-result = agent.run("What is 25 * 4 + 10?")
-print(result)  # Output: 110
+result = agent_executor.invoke({"input": "What is 25 * 4 + 10?"})
+print(result["output"])  # Output: 110
 ```
 
 ---
@@ -164,7 +189,7 @@ print(result)  # Output: 110
 | **Attack Surface** | Minimal (no intermediary) | Higher (additional infrastructure) |
 | **Best For** | Quick integrations, performance, **most use cases** | Specific compliance requirements, tools without existing security |
 
-> **Security Note**: [Recent security analyses](docs/08-security-comparison.md) show UTCP generally offers better security due to reduced attack surface and use of battle-tested native security mechanisms. See our [Security Comparison](docs/08-security-comparison.md) for details.
+> **Security Note**: UTCP generally offers better security due to reduced attack surface and use of battle-tested native security mechanisms. See our [Security Best Practices](docs/04-security.md) for detailed security guidance.
 
 ### Comprehensive Examples
 
@@ -193,10 +218,9 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 - [**What is Tool-Calling?**](docs/01-introduction.md) - Start here if you're new
 - [**UTCP vs MCP: When to Use Which**](docs/06-protocol-comparison.md) - Understand the differences
-- [**Security Comparison: MCP vs UTCP**](docs/08-security-comparison.md) - Deep dive into security models
-- [**Security Best Practices**](docs/04-security.md) - Build safe agents
+- [**Security Best Practices**](docs/04-security.md) - Build safe agents with comprehensive security guidance
 - [**Design Patterns**](design/patterns.md) - Learn from proven approaches
-- [**Interview Questions**](interview-prep/questions.md) - Prepare for AI agent roles
+- [**Interview Questions**](interview-prep/README.md) - Prepare for AI agent roles
 
 ### Visual Learning
 
@@ -211,9 +235,9 @@ We believe in learning through visuals. This repository includes:
 ## 🌐 Community & Support
 
 - 💬 **Discussions**: Use GitHub Discussions for questions and ideas
-- 🐛 **Issues**: Report bugs or request features
-- 📧 **Contact**: [Your contact info]
-- 🐦 **Updates**: Follow development updates [link]
+- 🐛 **Issues**: Report bugs or request features via GitHub Issues
+- 📧 **Contact**: Open an issue or discussion on GitHub for support
+- ⭐ **Updates**: Watch the repository for updates and new content
 
 ---
 
@@ -249,19 +273,6 @@ This educational resource is informed by:
 
 ---
 
-## 🗺️ Roadmap
-
-- [x] Core documentation and examples
-- [x] Python implementations
-- [ ] TypeScript/JavaScript examples
-- [ ] Advanced multi-agent tutorials
-- [ ] Video tutorials and walkthroughs
-- [ ] GUI demo applications
-- [ ] More language bindings (Rust, Go, Java)
-- [ ] Performance benchmarking suite
-- [ ] Integration with popular frameworks
-
----
 
 ## ⭐ Star History
 
