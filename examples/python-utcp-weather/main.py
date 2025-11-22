@@ -26,7 +26,7 @@ from datetime import datetime
 # UTCP imports
 from utcp.utcp_client import UtcpClient
 from utcp.data.utcp_client_config import UtcpClientConfig
-from utcp.data.call_template import CallTemplate
+from utcp_text.text_call_template import TextCallTemplate
 
 # OpenAI import
 import openai  # pyright: ignore[reportMissingImports]
@@ -53,12 +53,11 @@ class WeatherAgent:
         # Set environment variable for UTCP to use
         os.environ['OPENWEATHER_API_KEY'] = self.openweather_api_key
         
-        # Create UTCP configuration
+        # Create UTCP configuration with TextCallTemplate
         config = UtcpClientConfig(
             manual_call_templates=[
-                CallTemplate(
+                TextCallTemplate(
                     name="weather_tools",
-                    call_template_type="text",
                     file_path="./weather_manual.json"
                 )
             ],
@@ -70,8 +69,8 @@ class WeatherAgent:
         # Create UTCP client
         self.utcp_client = await UtcpClient.create(config=config)
         
-        # Get available tools
-        tools = await self.utcp_client.get_tools()
+        # Search for all tools (query="" returns all tools)
+        tools = await self.utcp_client.search_tools(query="", limit=100)
         
         print("✓ Weather Agent initialized with UTCP v1.0.1 library")
         print(f"✓ Loaded {len(tools)} tools:")
@@ -82,15 +81,18 @@ class WeatherAgent:
     
     async def get_openai_tools(self) -> List[Dict]:
         """Convert UTCP tools to OpenAI function calling format"""
-        utcp_tools = await self.utcp_client.get_tools()
+        utcp_tools = await self.utcp_client.search_tools(query="", limit=100)
         openai_tools = []
         
         for tool in utcp_tools:
+            # OpenAI doesn't allow dots in function names, so use just the tool name without prefix
+            tool_name = tool.name.split('.')[-1] if '.' in tool.name else tool.name
+            
             # Convert UTCP tool to OpenAI format
             openai_tools.append({
                 "type": "function",
                 "function": {
-                    "name": tool.name,
+                    "name": tool_name,
                     "description": tool.description,
                     "parameters": tool.inputs
                 }
@@ -166,16 +168,27 @@ class WeatherAgent:
                 
                 # Execute tool calls
                 for tool_call in message.tool_calls:
-                    tool_name = tool_call.function.name
+                    tool_name_short = tool_call.function.name
                     tool_args = json.loads(tool_call.function.arguments)
                     
+                    # Find the full tool name (with prefix) from UTCP
+                    all_tools = await self.utcp_client.search_tools(query="", limit=100)
+                    full_tool_name = None
+                    for t in all_tools:
+                        if t.name.endswith(tool_name_short):
+                            full_tool_name = t.name
+                            break
+                    
+                    if not full_tool_name:
+                        full_tool_name = tool_name_short
+                    
                     if verbose:
-                        print(f"  🌤️  Calling UTCP tool: {tool_name}")
+                        print(f"  🌤️  Calling UTCP tool: {full_tool_name}")
                         print(f"     Parameters: {json.dumps(tool_args, indent=6)}")
                     
                     # Execute via UTCP library
                     try:
-                        result = await self.utcp_client.call_tool(tool_name, tool_args)
+                        result = await self.utcp_client.call_tool(full_tool_name, tool_args)
                         
                         # Parse result if it's a JSON string
                         if isinstance(result, str):

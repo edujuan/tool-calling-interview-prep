@@ -1,11 +1,6 @@
 {
   "utcp_version": "1.0.1",
   "manual_version": "1.0.0",
-  "info": {
-    "title": "OpenWeatherMap API",
-    "version": "2.5.0",
-    "description": "Current weather and forecast data"
-  },
   "tools": [
     {
       "name": "get_current_weather",
