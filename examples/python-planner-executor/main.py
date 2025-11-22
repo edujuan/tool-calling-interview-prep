@@ -177,9 +177,8 @@ Guidelines:
 Plan:"""
         
         response = self.client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": planning_prompt}],
-            temperature=0
+            model="gpt-5-mini",
+            messages=[{"role": "user", "content": planning_prompt}]
         )
         
         # Parse plan
@@ -346,9 +345,8 @@ Execution Results:
 Provide a clear, concise answer that directly addresses the user's question:"""
         
         response = self.client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": synthesis_prompt}],
-            temperature=0
+            model="gpt-5-mini",
+            messages=[{"role": "user", "content": synthesis_prompt}]
         )
         
         answer = response.choices[0].message.content

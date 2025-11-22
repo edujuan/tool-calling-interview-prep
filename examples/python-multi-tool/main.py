@@ -459,7 +459,7 @@ class ToolRegistry:
 class MultiToolAgent:
     """Agent that uses multiple tools intelligently"""
     
-    def __init__(self, api_key: str, model: str = "gpt-4-turbo-preview"):
+    def __init__(self, api_key: str, model: str = "gpt-5-mini"):
         self.client = openai.OpenAI(api_key=api_key)
         self.model = model
         self.registry = ToolRegistry()

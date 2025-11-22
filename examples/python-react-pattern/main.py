@@ -151,9 +151,8 @@ Let's begin!
     def _call_llm(self, prompt: str) -> str:
         """Call OpenAI API"""
         response = self.client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0
+            model="gpt-5-mini",
+            messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
     

@@ -26,8 +26,8 @@ Get your API key at: https://openweathermap.org/api
 
 import os
 import json
-import requests
-import openai
+import requests  # pyright: ignore[reportMissingModuleSource]
+import openai  # pyright: ignore[reportMissingImports]
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 from datetime import datetime
@@ -381,7 +381,7 @@ class WeatherAgent:
             
             # Call LLM
             response = self.openai_client.chat.completions.create(
-                model="gpt-4-turbo-preview",
+                model="gpt-5-mini",
                 messages=self.conversation_history,
                 tools=self.utcp_executor.get_openai_tools(),
                 tool_choice="auto"

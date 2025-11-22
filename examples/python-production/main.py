@@ -381,7 +381,7 @@ class ProductionAgent:
     def __init__(
         self,
         api_key: str,
-        model: str = "gpt-3.5-turbo",
+        model: str = "gpt-5-mini",
         log_file: Optional[str] = "agent.log",
         rate_limit: int = 60
     ):
@@ -620,7 +620,7 @@ def main():
     # Initialize production agent
     agent = ProductionAgent(
         api_key=api_key,
-        model="gpt-3.5-turbo",
+        model="gpt-5-mini",
         log_file="production_agent.log",
         rate_limit=60  # 60 requests per minute
     )

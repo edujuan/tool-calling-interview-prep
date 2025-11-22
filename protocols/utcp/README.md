@@ -660,5 +660,6 @@ utcp-registry serve --port 8080
 **Next Steps:**
 - [Try UTCP Example](../../examples/python-utcp-weather/)
 - [Compare with MCP](../comparison.md)
-- [Read Full Specification](specification.md)
+- [Read Full Specification](./specification.md)
+- [Build Your First UTCP Integration](./tutorial.md)
 

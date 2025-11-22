@@ -190,7 +190,7 @@ class FileOperationsAgent:
             
             # Call LLM
             response = self.openai_client.chat.completions.create(
-                model="gpt-4-turbo-preview",
+                model="gpt-5-mini",
                 messages=self.conversation_history,
                 tools=self.mcp_client.get_openai_tools(),
                 tool_choice="auto"

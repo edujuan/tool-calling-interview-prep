@@ -85,7 +85,7 @@ def run_agent(user_message: str, verbose: bool = True):
         print("🤔 Agent is thinking...")
     
     response = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-5-mini",
         messages=messages,
         tools=tools,
         tool_choice="auto"  # Let model decide whether to use tool
@@ -131,7 +131,7 @@ def run_agent(user_message: str, verbose: bool = True):
             print("🤔 Agent is formulating final response...")
         
         final_response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-5-mini",
             messages=messages
         )
         

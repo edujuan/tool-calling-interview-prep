@@ -568,7 +568,7 @@ class ResilientAgent:
     def _call_llm_with_retry(self, messages):
         """Call LLM with retry logic"""
         return self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-5-mini",
             messages=messages,
             tools=self._get_tool_definitions(),
             tool_choice="auto"

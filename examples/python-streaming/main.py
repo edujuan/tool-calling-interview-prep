@@ -18,8 +18,8 @@ import json
 import time
 from typing import Generator, Dict, Any, List
 from dataclasses import dataclass
-from openai import OpenAI
-from dotenv import load_dotenv
+from openai import OpenAI  # pyright: ignore[reportMissingImports]
+from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
 
 load_dotenv()
 
@@ -185,7 +185,7 @@ class StreamingAgent:
     especially for long responses.
     """
     
-    def __init__(self, api_key: str, model: str = "gpt-3.5-turbo"):
+    def __init__(self, api_key: str, model: str = "gpt-5-mini"):
         self.client = OpenAI(api_key=api_key)
         self.model = model
         self.display = StreamingDisplay()
