@@ -1,0 +1,80 @@
+{
+  "utcp_version": "1.0.1",
+  "manual_version": "1.0.0",
+  "info": {
+    "title": "OpenWeatherMap API",
+    "version": "2.5.0",
+    "description": "Current weather and forecast data"
+  },
+  "tools": [
+    {
+      "name": "get_current_weather",
+      "description": "Get current weather conditions for any city worldwide. Returns temperature, humidity, wind speed, and weather conditions.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string",
+            "description": "City name, e.g., 'London' or 'New York,US' or coordinates 'lat,lon'"
+          },
+          "units": {
+            "type": "string",
+            "description": "Units of measurement: 'metric' (Celsius), 'imperial' (Fahrenheit), or 'standard' (Kelvin)",
+            "enum": ["metric", "imperial", "standard"],
+            "default": "metric"
+          }
+        },
+        "required": ["q"]
+      },
+      "tool_call_template": {
+        "call_template_type": "http",
+        "url": "https://api.openweathermap.org/data/2.5/weather",
+        "http_method": "GET",
+        "query_params": {
+          "q": "${q}",
+          "units": "${units}",
+          "appid": "${OPENWEATHER_API_KEY}"
+        }
+      }
+    },
+    {
+      "name": "get_weather_forecast",
+      "description": "Get 5-day weather forecast with 3-hour intervals for any city. Returns list of forecasts with temperature, conditions, and timestamps.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string",
+            "description": "City name, e.g., 'London' or 'New York,US'"
+          },
+          "units": {
+            "type": "string",
+            "description": "Units of measurement: 'metric', 'imperial', or 'standard'",
+            "enum": ["metric", "imperial", "standard"],
+            "default": "metric"
+          },
+          "cnt": {
+            "type": "integer",
+            "description": "Number of forecast entries to return (max 40, ~5 days with 3-hour intervals)",
+            "default": 8,
+            "minimum": 1,
+            "maximum": 40
+          }
+        },
+        "required": ["q"]
+      },
+      "tool_call_template": {
+        "call_template_type": "http",
+        "url": "https://api.openweathermap.org/data/2.5/forecast",
+        "http_method": "GET",
+        "query_params": {
+          "q": "${q}",
+          "units": "${units}",
+          "cnt": "${cnt}",
+          "appid": "${OPENWEATHER_API_KEY}"
+        }
+      }
+    }
+  ]
+}
+

@@ -1,8 +1,8 @@
-# UTCP Weather Agent Example (Official v1.0.1 Format)
+# UTCP Weather Agent Example (Official v1.0.1 Library)
 
-> **Real-world UTCP v1.0.1 implementation with OpenWeatherMap API**
+> **Real-world UTCP v1.0.1 implementation using the actual Python library**
 
-**✅ Updated:** This example uses the official UTCP v1.0.1 specification format
+**✅ Updated:** This example uses the official UTCP v1.0.1 Python library (`utcp`, `utcp-http`)
 
 ---
 
@@ -30,9 +30,16 @@ UTCP is an alternative to MCP (Model Context Protocol) with a simpler architectu
 | **Architecture** | Client-Server | Direct API |
 | **State** | Stateful sessions | Stateless |
 | **Setup** | Run server process | Load JSON manual |
-| **Transport** | STDIO/SSE | HTTP/S |
+| **Library** | Custom server code | Official client library |
 | **Complexity** | Higher | Lower |
 | **Best For** | Complex integrations | Simple API calls |
+
+### This Example Uses
+
+- ✅ Official UTCP v1.0.1 Python library
+- ✅ `UtcpClient` for tool execution
+- ✅ `CallTemplate` for manual loading
+- ✅ Proper async/await patterns
 
 ---
 
@@ -50,10 +57,11 @@ UTCP is an alternative to MCP (Model Context Protocol) with a simpler architectu
    - Temperature ranges
    - Condition predictions
 
-3. **UTCP Manual Format**
-   - Declarative API definitions
-   - Built-in authentication
-   - Parameter validation
+3. **UTCP v1.0.1 Library**
+   - Official Python client (`utcp`)
+   - HTTP protocol plugin (`utcp-http`)
+   - Async tool execution
+   - Proper variable substitution (`${VAR}` syntax)
 
 ---
 
