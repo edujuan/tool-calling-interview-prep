@@ -22,7 +22,8 @@ The heart of UTCP is the **manual** - a JSON document that describes how to call
 **Example Manual:**
 ```json
 {
-  "utcp_version": "1.0",
+  "utcp_version": "1.0.1",
+  "manual_version": "1.0.0",
   "tools": [
     {
       "name": "get_weather",
@@ -61,7 +62,7 @@ The heart of UTCP is the **manual** - a JSON document that describes how to call
 
 ### Call Templates
 
-UTCP supports multiple transport types via call templates:
+UTCP supports multiple transport types via call templates. This flexibility allows UTCP to work with virtually any tool interface, from standard REST APIs to real-time streaming protocols.
 
 #### 1. HTTP/REST
 ```json
@@ -110,7 +111,38 @@ UTCP supports multiple transport types via call templates:
 }
 ```
 
-#### 5. MCP (Yes, UTCP can call MCP!)
+#### 5. WebSocket
+```json
+{
+  "call_template_type": "websocket",
+  "url": "wss://api.example.com/stream",
+  "message_template": {
+    "action": "{{action}}",
+    "data": "{{data}}"
+  },
+  "auth": {
+    "type": "token",
+    "token": "${WS_TOKEN}"
+  }
+}
+```
+
+#### 6. Server-Sent Events (SSE)
+```json
+{
+  "call_template_type": "sse",
+  "url": "https://api.example.com/events",
+  "http_method": "GET",
+  "query_params": {
+    "channel": "{{channel}}"
+  },
+  "headers": {
+    "Accept": "text/event-stream"
+  }
+}
+```
+
+#### 7. MCP (Yes, UTCP can call MCP!)
 ```json
 {
   "call_template_type": "mcp",
@@ -163,10 +195,10 @@ Here's a full UTCP manual with multiple tools:
 
 ```json
 {
-  "utcp_version": "1.0",
+  "utcp_version": "1.0.1",
+  "manual_version": "2.1.0",
   "metadata": {
     "title": "Example Service Tools",
-    "version": "2.1.0",
     "description": "Tools for interacting with Example Service",
     "tags": ["weather", "maps", "search"]
   },
@@ -399,9 +431,10 @@ print(result)  # {"temp": 18, "condition": "cloudy"}
 ## ⚡ Advantages
 
 **1. Performance**
-- No proxy overhead (~30-40% faster than MCP)
+- No proxy overhead (typically 20-40% lower latency than MCP for remote tools)
 - Direct protocol usage
 - Minimal client-side processing
+- Note: Performance gains are most significant for HTTP/REST tools; with MCP's STDIO transport (local), differences are smaller
 
 **2. Simplicity**
 - Just a JSON file
@@ -409,9 +442,10 @@ print(result)  # {"temp": 18, "condition": "cloudy"}
 - No new infrastructure
 
 **3. Flexibility**
-- Support for 10+ protocols
+- Support for 10+ protocols (HTTP, WebSocket, SSE, gRPC, CLI, GraphQL, and more)
 - Works with any API
 - Easy OpenAPI conversion
+- Streaming support via SSE and WebSocket
 
 **4. Security**
 - Uses tool's native authentication
@@ -517,12 +551,14 @@ utcp-registry serve --port 8080
 **4. Version Your Manuals**
 ```json
 {
-  "utcp_version": "1.0",
+  "utcp_version": "1.0.1",
+  "manual_version": "2.1.0",
   "metadata": {
-    "version": "2.1.0"
+    "title": "My Tools"
   }
 }
 ```
+*Note: `utcp_version` specifies the protocol version, while `manual_version` specifies your tool manual's version*
 
 **5. Document Response Schemas**
 ```json
@@ -564,10 +600,23 @@ utcp-registry serve --port 8080
 
 ## 🔗 Resources
 
-- [Official UTCP Specification](https://www.utcp.io/spec)
-- [UTCP GitHub Organization](https://github.com/utcp-org)
-- [Example Manuals](https://github.com/utcp-org/examples)
-- [Community Discord](https://discord.gg/utcp)
+**Official Documentation:**
+- [Official UTCP Specification v1.0.1](https://www.utcp.io/spec) - Complete protocol specification
+- [UTCP RFC](https://www.utcp.io/rfc) - Design rationale and philosophy
+- [UTCP API Reference](https://www.utcp.io/api) - Implementation guide
+
+**Code & Examples:**
+- [UTCP GitHub Organization](https://github.com/utcp-org) - Official implementations
+- [Example Manuals](https://github.com/utcp-org/examples) - Real-world UTCP manuals
+- [OpenAPI to UTCP Converter](https://github.com/utcp-org/openapi-converter) - Convert existing specs
+
+**Community:**
+- [Community Discord](https://discord.gg/utcp) - Discussion and support
+- [UTCP Blog](https://www.utcp.io/blog) - Updates and best practices
+
+**Related Standards:**
+- [OpenAPI 3.0 Specification](https://spec.openapis.org/oas/v3.0.0) - For REST API documentation
+- [JSON Schema](https://json-schema.org/) - For parameter validation
 
 ---
 

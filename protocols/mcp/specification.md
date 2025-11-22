@@ -699,6 +699,287 @@ MCP servers can provide more than just tools:
 
 ---
 
+## Bidirectional Communication & Sampling
+
+One of MCP's most powerful features is **bidirectional communication** - the ability for servers to initiate requests back to the client. This enables interactive workflows and human-in-the-loop patterns.
+
+### Sampling: Server → Client Requests
+
+**Sampling** allows an MCP server to request that the client (agent) generate text via its LLM. This is useful when a tool needs:
+- Clarification from the user
+- Additional context to complete an operation
+- LLM assistance to process results
+- Interactive decision-making
+
+**Key Concept:** The server can ask the agent "please have your LLM generate a response to this prompt."
+
+### Sampling Flow
+
+```
+1. Client calls tool on server
+      ↓
+2. Server realizes it needs more info
+      ↓
+3. Server sends sampling request → Client
+      ↓
+4. Client presents to user (with approval)
+      ↓
+5. User approves request
+      ↓
+6. Client calls LLM with provided prompt
+      ↓
+7. LLM generates response
+      ↓
+8. Client returns result → Server
+      ↓
+9. Server uses result to complete tool
+      ↓
+10. Server returns final result → Client
+```
+
+### Sampling Request Format
+
+**Server → Client: sampling/createMessage**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "sampling/createMessage",
+  "params": {
+    "messages": [
+      {
+        "role": "user",
+        "content": {
+          "type": "text",
+          "text": "Based on the analysis results, should we proceed with the migration? Consider these factors: ..."
+        }
+      }
+    ],
+    "modelPreferences": {
+      "hints": [
+        {
+          "name": "claude-3-5-sonnet-20241022"
+        }
+      ],
+      "intelligenceLevel": 0.5,
+      "costLevel": 0.5
+    },
+    "systemPrompt": "You are an expert database administrator evaluating migration plans.",
+    "maxTokens": 1000
+  }
+}
+```
+
+**Client → Server: sampling response**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "model": "claude-3-5-sonnet-20241022",
+    "role": "assistant",
+    "content": {
+      "type": "text",
+      "text": "Based on the analysis, I recommend proceeding with the migration because..."
+    },
+    "stopReason": "end_turn"
+  }
+}
+```
+
+### Server-Side Implementation
+
+```python
+from mcp.server import Server
+from mcp.types import SamplingRequest, TextContent
+
+class InteractiveMCPServer(Server):
+    """MCP server that uses sampling for interactive workflows"""
+    
+    async def call_tool_impl(self, name: str, arguments: dict):
+        if name == "deploy_changes":
+            # Analyze deployment risks
+            risks = self._analyze_deployment(arguments)
+            
+            if risks['severity'] == 'high':
+                # Ask LLM to help decide
+                sampling_result = await self.request_sampling(
+                    messages=[{
+                        "role": "user",
+                        "content": {
+                            "type": "text",
+                            "text": f"Deployment has high-risk changes: {risks['details']}. "
+                                   f"Should we proceed? Provide reasoning."
+                        }
+                    }],
+                    system_prompt="You are a cautious DevOps engineer.",
+                    max_tokens=500
+                )
+                
+                decision_text = sampling_result.content.text
+                
+                # Parse LLM decision
+                if "proceed" in decision_text.lower():
+                    result = self._execute_deployment(arguments)
+                    return [TextContent(
+                        type="text",
+                        text=f"Deployment executed. LLM reasoning: {decision_text}"
+                    )]
+                else:
+                    return [TextContent(
+                        type="text",
+                        text=f"Deployment cancelled based on LLM analysis: {decision_text}"
+                    )]
+            
+            # Low risk - proceed automatically
+            result = self._execute_deployment(arguments)
+            return [TextContent(type="text", text=f"Deployed: {result}")]
+```
+
+### Client-Side Handling
+
+```python
+from mcp.client import Client
+
+class MCPClientWithSampling(Client):
+    """MCP client that handles sampling requests"""
+    
+    def __init__(self, llm_client, user_approval_callback):
+        super().__init__()
+        self.llm_client = llm_client
+        self.user_approval = user_approval_callback
+    
+    async def handle_sampling_request(self, request: dict):
+        """Handle server-initiated sampling request"""
+        
+        # Extract sampling parameters
+        messages = request['params']['messages']
+        system_prompt = request['params'].get('systemPrompt', '')
+        max_tokens = request['params'].get('maxTokens', 1000)
+        
+        # Security: Request user approval first
+        approved = await self.user_approval(
+            f"Server wants to use your LLM with prompt: {messages[0]['content']['text']}"
+        )
+        
+        if not approved:
+            return {
+                "jsonrpc": "2.0",
+                "id": request['id'],
+                "error": {
+                    "code": -32000,
+                    "message": "User denied sampling request"
+                }
+            }
+        
+        # Call LLM
+        llm_response = await self.llm_client.generate(
+            messages=messages,
+            system=system_prompt,
+            max_tokens=max_tokens
+        )
+        
+        # Return result to server
+        return {
+            "jsonrpc": "2.0",
+            "id": request['id'],
+            "result": {
+                "model": llm_response.model,
+                "role": "assistant",
+                "content": {
+                    "type": "text",
+                    "text": llm_response.text
+                },
+                "stopReason": llm_response.stop_reason
+            }
+        }
+```
+
+### Use Cases for Bidirectional Communication
+
+**1. Interactive Approvals**
+```python
+# Server requests approval for sensitive operation
+sampling_result = await server.request_sampling(
+    messages=[{"role": "user", "content": {"type": "text", "text": "Confirm: Delete production database 'users'? (yes/no)"}}],
+    max_tokens=10
+)
+```
+
+**2. Contextual Analysis**
+```python
+# Server provides data, asks LLM to analyze
+await server.request_sampling(
+    messages=[{
+        "role": "user", 
+        "content": {"type": "text", "text": f"Here's the log data: {logs}. What caused the error?"}
+    }],
+    system_prompt="You are a debugging expert."
+)
+```
+
+**3. Dynamic Tool Selection**
+```python
+# Server asks which approach to use
+await server.request_sampling(
+    messages=[{
+        "role": "user",
+        "content": {"type": "text", "text": "We have 3 backup strategies: A (fast, risky), B (balanced), C (slow, safe). Which should we use given: ..."}
+    }]
+)
+```
+
+**4. Progressive Refinement**
+```python
+# Server iteratively refines output with LLM help
+draft = initial_draft()
+for iteration in range(3):
+    feedback = await server.request_sampling(
+        messages=[{"role": "user", "content": {"type": "text", "text": f"Improve this: {draft}"}}]
+    )
+    draft = feedback.content.text
+```
+
+### Security Considerations
+
+**⚠️ Critical: Sampling requires user approval**
+
+```python
+# Client MUST request user permission
+async def safe_sampling_handler(request):
+    # Show user what the server is requesting
+    print(f"⚠️  Server wants to use your LLM:")
+    print(f"Prompt: {request['params']['messages']}")
+    print(f"Cost estimate: ~{estimate_cost(request)} tokens")
+    
+    approval = input("Allow? (yes/no): ")
+    
+    if approval.lower() != 'yes':
+        return {"error": {"code": -32000, "message": "User denied"}}
+    
+    # Only then proceed with LLM call
+    return await call_llm(request)
+```
+
+**Why approval is needed:**
+- Sampling uses client's LLM (costs money)
+- Server could inject malicious prompts
+- User should control what their LLM sees
+- Prevents prompt injection via server
+
+### Comparison: MCP vs UTCP
+
+| Feature | MCP | UTCP |
+|---------|-----|------|
+| **Server → Client calls** | ✅ Yes (sampling) | ❌ No |
+| **Interactive workflows** | ✅ Native support | ⚠️ Manual implementation |
+| **Human-in-the-loop** | ✅ Built-in pattern | ⚠️ Agent must handle |
+| **Tool callbacks** | ✅ Yes | ❌ One-way only |
+
+**This is a key differentiator:** MCP's bidirectional communication enables workflows that would be difficult with stateless protocols like UTCP.
+
+---
+
 ## Transport Layers
 
 MCP supports two main transport mechanisms:
@@ -1078,9 +1359,20 @@ async def call_tool_impl(self, name: str, arguments: dict):
 
 ---
 
+**Official Resources:**
+- [Official MCP Documentation](https://modelcontextprotocol.io/) - Complete documentation
+- [MCP Specification](https://spec.modelcontextprotocol.io/) - Protocol specification (latest: 2024-11-05)
+- [Anthropic MCP Announcement](https://www.anthropic.com/news/model-context-protocol) - Original announcement and vision
+- [MCP GitHub Repository](https://github.com/modelcontextprotocol) - SDKs and examples
+
+**Learning Resources:**
+- [MCP Quickstart Guide](https://modelcontextprotocol.io/quickstart) - Get started in 10 minutes
+- [Building MCP Servers Tutorial](https://modelcontextprotocol.io/tutorials/building-servers) - Step-by-step guide
+- [MCP Inspector](https://github.com/modelcontextprotocol/inspector) - Debugging tool
+- [Hugging Face MCP Course](https://huggingface.co/learn/cookbook/mcp) - Comprehensive learning path
+
 **Next Steps:**
 - [MCP vs UTCP Comparison](../comparison.md)
 - [Build Your First MCP Server](./tutorial.md)
 - [MCP Example: File Operations](../../examples/python-mcp-files/)
-- [Official MCP Documentation](https://modelcontextprotocol.io/)
 

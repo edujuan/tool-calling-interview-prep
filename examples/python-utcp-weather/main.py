@@ -35,7 +35,8 @@ from datetime import datetime
 
 WEATHER_UTCP_MANUAL = {
     "protocol": "utcp",
-    "version": "1.0",
+    "utcp_version": "1.0.1",
+    "manual_version": "1.0.0",
     "tool": {
         "name": "get_current_weather",
         "description": "Get current weather conditions for any city worldwide",
@@ -74,7 +75,8 @@ WEATHER_UTCP_MANUAL = {
 
 FORECAST_UTCP_MANUAL = {
     "protocol": "utcp",
-    "version": "1.0",
+    "utcp_version": "1.0.1",
+    "manual_version": "1.0.0",
     "tool": {
         "name": "get_weather_forecast",
         "description": "Get 5-day weather forecast with 3-hour intervals for any city",

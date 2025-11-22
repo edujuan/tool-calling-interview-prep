@@ -17,16 +17,16 @@ This directory contains working examples of AI agents with tool-calling capabili
 | Example | Language | Protocol | Complexity | Time |
 |---------|----------|----------|------------|------|
 | [Multi-Tool Agent](python-multi-tool/) | Python | Both | ⭐⭐ | 30 min |
-| [Web Search Agent](typescript-search/) | TypeScript | UTCP | ⭐⭐ | 30 min |
-| [Database Assistant](python-database/) | Python | MCP | ⭐⭐⭐ | 45 min |
+| [ReAct Pattern Agent](python-react-pattern/) | Python | None | ⭐⭐ | 30 min |
+| [Planner-Executor Agent](python-planner-executor/) | Python | None | ⭐⭐⭐ | 45 min |
 
 ### Advanced Examples
 
 | Example | Language | Protocol | Complexity | Time |
 |---------|----------|----------|------------|------|
-| [Multi-Agent System](python-multi-agent/) | Python | Both | ⭐⭐⭐⭐ | 1 hour |
-| [Streaming Agent](python-streaming/) | Python | UTCP | ⭐⭐⭐ | 45 min |
-| [Production-Ready Agent](python-production/) | Python | Both | ⭐⭐⭐⭐⭐ | 2 hours |
+| [Error Handling Showcase](python-error-handling/) | Python | None | ⭐⭐⭐ | 45 min |
+| [Streaming Agent](python-streaming/) | Python | None | ⭐⭐⭐ | 45 min |
+| [Production-Ready Agent](python-production/) | Python | None | ⭐⭐⭐⭐⭐ | 1 hour |
 
 ## 🚀 Quick Start
 
@@ -86,26 +86,25 @@ example-name/
 ### Learn Basic Tool-Calling
 1. [Simple Calculator Agent](python-basic/) - Minimal example
 2. [Weather Agent](python-utcp-weather/) - Real API integration
+3. [Multi-Tool Agent](python-multi-tool/) - Multiple tool sources
 
-### Learn UTCP
-1. [Weather Agent (UTCP)](python-utcp-weather/)
-2. [Multi-Tool UTCP](python-utcp-multi/)
-3. [OpenAPI to UTCP](python-openapi-convert/)
+### Learn UTCP Protocol
+1. [Weather Agent (UTCP)](python-utcp-weather/) - Real OpenWeatherMap API
+2. [Multi-Tool UTCP](python-multi-tool/) - Hybrid MCP/UTCP usage
 
-### Learn MCP
-1. [File Reader (MCP)](python-mcp-files/)
-2. [Custom MCP Server](python-mcp-custom/)
-3. [MCP Multi-Server](python-mcp-multi-server/)
+### Learn MCP Protocol
+1. [File Reader (MCP)](python-mcp-files/) - Complete MCP server/client
+2. [Multi-Tool Agent](python-multi-tool/) - Hybrid MCP/UTCP usage
 
 ### Learn Agent Architectures
-1. [ReAct Agent](python-react-pattern/)
-2. [Plan-and-Execute](python-planner-executor/)
-3. [Multi-Agent Collaboration](python-multi-agent/)
+1. [ReAct Agent](python-react-pattern/) - Reasoning + Acting pattern
+2. [Plan-and-Execute](python-planner-executor/) - Upfront planning pattern
+3. [Multi-Tool Agent](python-multi-tool/) - Tool registry pattern
 
 ### Learn Production Practices
-1. [Error Handling](python-error-handling/)
-2. [Sandboxed Execution](python-sandboxing/)
-3. [Production-Ready Agent](python-production/)
+1. [Error Handling](python-error-handling/) - Retry, circuit breaker, validation
+2. [Streaming Responses](python-streaming/) - Real-time token streaming
+3. [Production-Ready Agent](python-production/) - Monitoring, logging, metrics
 
 ## 💻 Example Code Snippets
 

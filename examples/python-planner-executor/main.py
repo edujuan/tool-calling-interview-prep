@@ -385,7 +385,8 @@ Provide a clear, concise answer that directly addresses the user's question:"""
         descriptions = []
         for name, func in self.tools.items():
             doc = func.__doc__ or "No description"
-            descriptions.append(f"- {name}: {doc.strip().split('\\n')[0]}")
+            first_line = doc.strip().split('\n')[0]
+            descriptions.append(f"- {name}: {first_line}")
         return "\n".join(descriptions)
 
 
