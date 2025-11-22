@@ -118,14 +118,14 @@ User                LLM                 Tool Registry         Tool
 ```
 ┌───────────────────────────────────────────────────────────┐
 │                      REACT AGENT                          │
-│                                                            │
-│  ┌──────────┐     ┌──────────┐     ┌──────────┐         │
-│  │ THOUGHT  │ ──► │ ACTION   │ ──► │ OBSERVE  │ ──┐     │
-│  └──────────┘     └──────────┘     └──────────┘   │     │
+│                                                           │
+│  ┌──────────┐     ┌──────────┐     ┌──────────┐           │
+│  │ THOUGHT  │ ──► │ ACTION   │ ──► │ OBSERVE  │ --──┐     │
+│  └──────────┘     └──────────┘     └──────────┘     │     │
 │       ▲                                             │     │
 │       │                                             │     │
 │       └─────────────────────────────────────────────┘     │
-│                                                            │
+│                                                           │
 │  Loop continues until problem solved                      │
 └───────────────────────────────────────────────────────────┘
 
@@ -285,24 +285,24 @@ Cons: Extra hop, requires server
 
     ┌────────┐         ┌────────────┐
     │   AI   │         │   UTCP     │         ┌─────────┐
-    │ Agent  │◄───────►│  Executor  │◄───────►│   API   │
+    │ Agent  │◄───────►│   Client   │◄───────►│  Tool   │
     └────────┘         └────────────┘         └─────────┘
                              ▲
                              │
                        ┌─────┴──────┐
                        │ JSON Manual│
-                       │ (API Spec) │
+                       │ (Tool Spec)│
                        └────────────┘
 
 Flow:
-  1. Agent → Executor: "Call tool X with args Y"
-  2. Executor reads manual for tool X
-  3. Executor → API: Direct HTTP request
-  4. API → Executor: Response
-  5. Executor → Agent: Tool result
+  1. Agent → Client: "Call tool X with args Y"
+  2. Client reads manual for tool X
+  3. Client → Tool: Direct protocol request (HTTP, CLI, etc.)
+  4. Tool → Client: Response
+  5. Client → Agent: Tool result
 
-Pros: Faster, simpler, no server
-Cons: Limited to API calls, stateless
+Pros: Faster, simpler, no intermediary server, protocol-agnostic
+Cons: Requires client-side implementation, manual discovery needed
 
 ┌──────────────────────────────────────────────────────────────┐
 │                      KEY DIFFERENCES                          │

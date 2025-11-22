@@ -135,9 +135,13 @@ class SaferAgent:
    - Block outbound calls by default
    - Require approval for sensitive operations
 
+Breaking the trifecta reduces your risk, but it doesn't eliminate it. Even with perfect input sanitization and restricted data access, a determined attacker might find a way through. That's where defense-in-depth comes in - and the first layer is sandboxing.
+
 ---
 
 ## Sandboxing Strategies
+
+Think of sandboxing as building walls around your agent. Even if an attacker compromises the agent, the sandbox contains the damage. The agent can't escape to harm your system or steal data.
 
 Sandboxing limits the damage if an agent is compromised. Three levels of isolation:
 
@@ -407,11 +411,17 @@ requests.get('https://evil.com')
 print(result)  # {'success': False, 'error': '...'}
 ```
 
+Sandboxing protects you from code execution attacks. But there's a subtler, more insidious threat: prompt injection. Instead of attacking your infrastructure, attackers manipulate the LLM itself - tricking it into ignoring your instructions and following theirs instead.
+
+This is the AI-native security threat. Traditional security tools won't catch it because no code is being executed maliciously - the agent is just doing what the (manipulated) LLM tells it to do.
+
 ---
 
 ## Prompt Injection Defense
 
 Prompt injection is difficult to fully prevent. Use layered defenses:
+
+The uncomfortable truth: we don't have a perfect solution yet. But we can make attacks much harder.
 
 ### Understanding the Attack
 
@@ -711,9 +721,13 @@ class AgentMonitor:
         return False
 ```
 
+You've sandboxed your agent and defended against prompt injection. But even a perfectly secured agent needs to authenticate to external services. API keys, database passwords, OAuth tokens - these credentials are the keys to your kingdom. If they leak to the LLM's context, game over.
+
 ---
 
 ## Credential Management
+
+The golden rule: **Never let credentials touch the LLM's context**. The agent calls tools by name and arguments; the infrastructure handles authentication separately.
 
 Never expose credentials to the LLM. Use secure patterns:
 
@@ -881,9 +895,13 @@ class ToolPermissions:
         return CredentialManager.get_credential(perm["credential"])
 ```
 
+Credentials let your agent authenticate - prove it's allowed to access a service. But authentication isn't enough. Just because an agent *can* call your database doesn't mean it *should* have access to all tables. This is where authorization comes in: fine-grained control over what each agent (or each user through an agent) is permitted to do.
+
 ---
 
 ## Authorization and Access Control
+
+Think of this as the principle of least privilege for AI. An agent should have exactly the permissions it needs for its job, and no more.
 
 Implement RBAC (Role-Based Access Control) for agent tools:
 
@@ -967,9 +985,13 @@ analyst_agent.use_tool("read_customer_data", {})  # ✅ Allowed
 analyst_agent.use_tool("delete_records", {})      # ❌ PermissionError
 ```
 
+All the security controls in the world don't help if you can't see when they're being tested or breached. You need visibility into what your agents are doing - not just for debugging, but for detecting attacks in progress. Security monitoring is your early warning system.
+
 ---
 
 ## Monitoring and Observability
+
+If sandboxing and authorization are your walls, monitoring is your security cameras. You need to see everything that's happening so you can respond quickly when something looks wrong.
 
 Comprehensive logging and alerting for agent security:
 
@@ -1036,9 +1058,13 @@ class AgentSecurityLogger:
         return sanitized
 ```
 
+We've covered a lot of ground: sandboxing, prompt injection defense, credentials, authorization, monitoring. You might be wondering: "Do I really need all of this?" The answer depends on your threat model. But here's a checklist to help you decide what's essential for production.
+
 ---
 
 ## Production Checklist
+
+Think of this as your pre-flight checklist. Don't skip items just because they're inconvenient - each one exists because someone learned the hard way.
 
 Before deploying an AI agent to production:
 
@@ -1117,7 +1143,5 @@ Key security principles for AI agents:
 **Next:** [Multi-Agent Systems →](05-multi-agent.md)
 
 **See also:**
-- [Production Deployment Guide](../projects/production-deployment/)
-- [Security Testing Examples](../examples/security-testing/)
-- [Incident Response Playbook](./incident-response.md)
+- [Security Comparison: MCP vs UTCP →](08-security-comparison.md)
 

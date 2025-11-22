@@ -1,8 +1,12 @@
 # Fundamentals of Tool Use
 
-This chapter covers the core concepts you need to understand before building tool-calling agents.
+Now that you understand *why* tool-calling matters (from the Introduction), let's dive into *how* it actually works. This chapter breaks down the mechanics that power every tool-calling agent, from the simplest calculator bot to complex multi-agent systems.
+
+Think of this as learning the grammar before writing sentences. Once you understand these fundamentals, the agent architectures and patterns in later chapters will make much more sense.
 
 ## Core Concepts
+
+Before an agent can use a tool, it needs to understand three things: what the tool is called, what it does, and what information it needs. Let's start with how tools are defined.
 
 ### 1. Tool Definition
 
@@ -35,9 +39,13 @@ calculator_tool = {
 }
 ```
 
+So that's how you define a single tool. But a real agent has access to many tools - dozens or even hundreds. This raises an important question: how does the agent learn what tools exist and what they do?
+
 ### 2. Tool Discovery
 
 **How does an agent know what tools are available?**
+
+Imagine walking into a workshop full of tools. Before you can fix anything, you need to know what's in your toolbox. Same with AI agents - they need a way to discover their capabilities.
 
 ```
 ┌─────────────────┐
@@ -74,13 +82,17 @@ calculator_tool = {
    - Best for: Large, changing toolsets
 
 3. **Protocol-Based** (Standard)
-   - MCP: Server advertises tools via `tools/list`
-   - UTCP: Agent loads tool manuals from URLs/files
+   - MCP: Server advertises tools via `tools/list`[[6]](https://www.anthropic.com/news/model-context-protocol)
+   - UTCP: Agent loads tool manuals from URLs/files[[8]](https://www.utcp.io/)
    - Best for: Interoperable systems
+
+Discovery tells the agent what tools exist. But knowing about a tool isn't the same as using it. Let's see what happens when an agent actually invokes a tool.
 
 ### 3. Tool Invocation
 
 **The complete flow:**
+
+This is where the magic happens - the LLM decides a tool is needed, the agent executes it, and the result comes back to inform the next step.
 
 ```python
 # 1. LLM decides to use a tool
@@ -104,7 +116,9 @@ llm_continues_with(result)
 
 ### 4. Tool Schemas
 
-Tools use **JSON Schema** to describe their inputs:
+For all this to work, the LLM needs to understand what each tool expects as input. This is where schemas come in - they're like type hints that tell the LLM exactly what format the arguments should take.
+
+Tools use **JSON Schema** to describe their inputs:[[9]](https://docs.fireworks.ai/guides/function-calling)
 
 ```json
 {
@@ -129,9 +143,13 @@ Tools use **JSON Schema** to describe their inputs:
 - Validation prevents errors
 - Documentation is built-in
 
+Now that we understand tools, discovery, invocation, and schemas, let's see how these pieces fit together in an agent's operation. This is the fundamental loop that powers almost every tool-calling agent.
+
 ## The Tool-Calling Loop
 
-Most agents follow this pattern:
+Most agents follow this pattern:[[11]](https://docs.fireworks.ai/guides/function-calling)
+
+This loop is the heartbeat of an agent. It continues cycling - thinking, acting, observing - until the task is complete.
 
 ```
 1. Receive user input
@@ -171,7 +189,11 @@ Step 3: LLM thinks: "Now I can compose and send email"
 Step 4: LLM responds: "I've sent the email with the current weather!"
 ```
 
+The loop above assumes tools execute immediately and return results quickly. But what if a tool takes 10 seconds? Or needs to run in parallel with others? This is where execution modes come in.
+
 ## Tool Execution Modes
+
+How you execute tools affects your agent's performance and responsiveness. There are three main approaches, each with different trade-offs:
 
 ### 1. Synchronous (Wait for Result)
 
@@ -222,9 +244,13 @@ for data_chunk in call_tool_streaming("large_query", {...}):
 
 **Best for**: Large data transfers, progress updates, long-running tasks
 
+No matter which execution mode you choose, there's one constant: things will go wrong. APIs fail, networks timeout, arguments are invalid. The difference between a toy agent and a production-ready one is often just error handling.
+
 ## Error Handling
 
 Tools can fail! Robust agents handle errors gracefully:
+
+Understanding what can go wrong is the first step to building resilient agents.
 
 ### Common Error Types
 
@@ -282,9 +308,15 @@ def safe_tool_call(tool_name, args):
 3. **Inform**: Tell the user what went wrong
 4. **Abort**: Give up and return error
 
+With error handling in place, your agent can reliably use individual tools. But the real power comes from combining tools - using outputs from one as inputs to another, or running multiple tools simultaneously.
+
 ## Tool Composition
 
+Complex tasks often require multiple tools working together. There are two primary patterns:
+
 **Chaining**: Use output of one tool as input to another
+
+This creates a pipeline where each tool builds on the previous one's work.
 
 ```python
 # Step 1: Get data
@@ -309,6 +341,8 @@ results = await asyncio.gather(
     weather_tool(location="Chicago")
 )
 ```
+
+You now understand the mechanics of tool-calling. But knowing how something works doesn't automatically mean you'll build it well. Let's cover the dos and don'ts learned from real-world agent development.
 
 ## Best Practices
 
@@ -401,6 +435,8 @@ results = await asyncio.gather(
 
 ## Summary
 
+You've just learned the grammar of tool-calling. These aren't abstract concepts - they're the building blocks that every agent uses, whether it's a simple calculator bot or a complex multi-agent system.
+
 **Core Principles:**
 
 1. Tools extend LLM capabilities with actions and real-time data
@@ -411,10 +447,11 @@ results = await asyncio.gather(
 
 **What's Next:**
 
-Now that you understand the fundamentals, let's explore:
-- How agents are architectured ([Agent Architectures](03-agent-architectures.md))
-- Specific protocols like MCP and UTCP ([Protocol docs](04-mcp-overview.md))
-- Building your first agent ([First Agent Tutorial](07-first-agent.md))
+With these fundamentals in place, you're ready to see how they come together in actual agent architectures. How do you structure the loop? When do you plan vs react? How do multiple agents coordinate?
+
+- **Beginner path**: Jump straight to [Building Your First Agent](07-first-agent.md) to apply these concepts hands-on
+- **Architectural path**: Explore [Agent Architectures](03-agent-architectures.md) to see different design patterns
+- **Protocol deep-dive**: Learn about [MCP vs UTCP](06-protocol-comparison.md) for standardized tool-calling
 
 ---
 

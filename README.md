@@ -21,7 +21,7 @@ Large Language Models (LLMs) are powerful but limited—they can't:
 - Query databases or call APIs
 - Run calculations or system commands
 
-**Tool-calling solves this.** It enables AI agents to extend their capabilities by invoking external tools, turning static models into dynamic, interactive agents that can truly help users accomplish tasks.
+**Tool-calling solves this.**[[1]](https://www.infoq.com/news/2023/06/openai-api-function-chatgpt/) It enables AI agents to extend their capabilities by invoking external tools, turning static models into dynamic, interactive agents that can truly help users accomplish tasks.
 
 ---
 
@@ -160,8 +160,11 @@ print(result)  # Output: 110
 | **Architecture** | Direct, stateless | Client-server, stateful |
 | **Setup Complexity** | Low (JSON manual) | Medium (server process) |
 | **Latency** | Lower (direct calls) | Higher (proxy hop) |
-| **Security Model** | Native API security | Centralized control |
-| **Best For** | Quick integrations, performance | Enterprise governance, complex workflows |
+| **Security Model** | Native API security (reduced attack surface) | Centralized control (increased attack surface) |
+| **Attack Surface** | Minimal (no intermediary) | Higher (additional infrastructure) |
+| **Best For** | Quick integrations, performance, **most use cases** | Specific compliance requirements, tools without existing security |
+
+> **Security Note**: [Recent security analyses](docs/08-security-comparison.md) show UTCP generally offers better security due to reduced attack surface and use of battle-tested native security mechanisms. See our [Security Comparison](docs/08-security-comparison.md) for details.
 
 ### Comprehensive Examples
 
@@ -189,7 +192,8 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ### Popular Topics
 
 - [**What is Tool-Calling?**](docs/01-introduction.md) - Start here if you're new
-- [**UTCP vs MCP: Complete Comparison**](protocols/comparison.md) - Understand the differences
+- [**UTCP vs MCP: When to Use Which**](docs/06-protocol-comparison.md) - Understand the differences
+- [**Security Comparison: MCP vs UTCP**](docs/08-security-comparison.md) - Deep dive into security models
 - [**Security Best Practices**](docs/04-security.md) - Build safe agents
 - [**Design Patterns**](design/patterns.md) - Learn from proven approaches
 - [**Interview Questions**](interview-prep/questions.md) - Prepare for AI agent roles

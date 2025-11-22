@@ -1,423 +1,239 @@
 # Design Patterns and Architecture
 
-This directory contains architectural diagrams, design patterns, and anti-patterns for building AI agents with tool-calling capabilities.
-
-## 📐 Contents
-
-### Core Documents
-- [**Design Patterns**](patterns.md) - Proven patterns for agent systems
-- [**Anti-Patterns**](anti-patterns.md) - Common mistakes and how to avoid them
-- [**Architecture Diagrams**](diagrams/) - Visual representations of systems
-- [**Design Decisions**](design-decisions.md) - How to make architectural choices
-
-### Diagrams
-- [Agent Architecture Patterns](diagrams/agent-architectures.png)
-- [UTCP vs MCP Comparison](diagrams/protocol-comparison.png)
-- [Security Layers](diagrams/security-architecture.png)
-- [Deployment Patterns](diagrams/deployment.png)
-
-## 🎨 Design Patterns
-
-### Pattern 1: Command Pattern for Tools
-
-**Problem:** Need consistent interface for diverse tools (APIs, CLIs, functions)
-
-**Solution:** Wrap all tools with a command interface
-
-```python
-class ToolCommand:
-    def execute(self, args):
-        raise NotImplementedError
-    
-    def validate(self, args):
-        raise NotImplementedError
-
-class WeatherCommand(ToolCommand):
-    def execute(self, args):
-        return call_weather_api(args["location"])
-    
-    def validate(self, args):
-        if "location" not in args:
-            raise ValueError("location required")
-
-# Usage
-tools = [WeatherCommand(), CalculatorCommand(), EmailCommand()]
-for tool in tools:
-    tool.validate(args)
-    result = tool.execute(args)
-```
-
-**Benefits:**
-- ✅ Uniform interface
-- ✅ Easy to add new tools
-- ✅ Centralized validation
-- ✅ Testable
+> **Architectural guidance, patterns, and anti-patterns for building robust AI agents with tool-calling capabilities**
 
 ---
 
-### Pattern 2: Circuit Breaker for Unreliable Tools
+## 📐 Overview
 
-**Problem:** External API fails repeatedly, agent wastes time retrying
-
-**Solution:** Circuit breaker pattern - stop calling failing services
-
-```python
-class CircuitBreaker:
-    def __init__(self, failure_threshold=5, timeout=60):
-        self.failure_count = 0
-        self.failure_threshold = failure_threshold
-        self.timeout = timeout
-        self.last_failure_time = None
-        self.state = "CLOSED"  # CLOSED, OPEN, HALF_OPEN
-    
-    def call(self, func, *args, **kwargs):
-        if self.state == "OPEN":
-            if time.time() - self.last_failure_time > self.timeout:
-                self.state = "HALF_OPEN"
-            else:
-                raise ServiceUnavailableError("Circuit breaker is OPEN")
-        
-        try:
-            result = func(*args, **kwargs)
-            if self.state == "HALF_OPEN":
-                self.state = "CLOSED"
-                self.failure_count = 0
-            return result
-        except Exception as e:
-            self.failure_count += 1
-            self.last_failure_time = time.time()
-            if self.failure_count >= self.failure_threshold:
-                self.state = "OPEN"
-            raise
-
-# Usage
-weather_breaker = CircuitBreaker()
-
-def call_weather_tool(location):
-    return weather_breaker.call(weather_api.get, location)
-```
-
-**Benefits:**
-- ✅ Fail fast instead of wasting time
-- ✅ Automatic recovery attempts
-- ✅ Protects downstream services
-- ✅ Better user experience (quick error vs timeout)
+This directory contains design patterns, anti-patterns, architecture diagrams, and best practices for building production-ready AI agent systems. Whether you're implementing ReAct agents, multi-agent systems, or tool-calling workflows, you'll find actionable patterns and visual guides here.
 
 ---
 
-### Pattern 3: Cache Pattern for Expensive Tools
+## 📚 Core Documentation
 
-**Problem:** Same tool called multiple times with same args (wasteful, slow)
+### [Design Patterns](patterns.md)
+**10 proven patterns for building reliable, maintainable AI agents**
 
-**Solution:** Cache tool results
+Covers tool design, agent architecture, error handling, state management, security, and testing patterns. Learn how to:
+- Wrap tools with validation and timeouts (Tool Wrapper Pattern)
+- Create tools from configurations (Factory Pattern)
+- Build complex workflows from simple tools (Composition Pattern)
+- Implement flexible agent behaviors (Strategy Pattern)
+- Handle cascading failures gracefully (Circuit Breaker Pattern)
+- Secure your agents with allowlists (Security Patterns)
+- Test agents without external dependencies (Test Double Pattern)
 
-```python
-from functools import lru_cache
-import hashlib
-import json
+### [Anti-Patterns](anti-patterns.md)
+**14 common mistakes to avoid when building AI agents**
 
-class ToolCache:
-    def __init__(self, ttl=300):  # 5 minute TTL
-        self.cache = {}
-        self.ttl = ttl
-    
-    def get_key(self, tool_name, args):
-        # Create cache key from tool name and args
-        args_str = json.dumps(args, sort_keys=True)
-        return f"{tool_name}:{hashlib.md5(args_str.encode()).hexdigest()}"
-    
-    def get(self, tool_name, args):
-        key = self.get_key(tool_name, args)
-        if key in self.cache:
-            result, timestamp = self.cache[key]
-            if time.time() - timestamp < self.ttl:
-                return result
-            del self.cache[key]
-        return None
-    
-    def set(self, tool_name, args, result):
-        key = self.get_key(tool_name, args)
-        self.cache[key] = (result, time.time())
+Learn what NOT to do through real-world examples. Key anti-patterns include:
+- **God Tools** - Tools that do too much
+- **Silent Failures** - Errors that look like success
+- **eval() for Everything** - Critical security vulnerability
+- **Credentials in Prompts** - Exposing secrets to LLMs
+- **Infinite Loop Trap** - Agents that never stop
+- **Testing in Production** - Using real APIs in tests
+- **No Input Validation** - Trusting LLM output blindly
 
-# Usage
-cache = ToolCache(ttl=300)
+Each anti-pattern includes bad examples, why it's problematic, and better approaches.
 
-def call_tool_with_cache(tool_name, args):
-    # Check cache first
-    cached = cache.get(tool_name, args)
-    if cached is not None:
-        return cached
-    
-    # Call tool
-    result = execute_tool(tool_name, args)
-    
-    # Cache result
-    cache.set(tool_name, args, result)
-    return result
-```
+### [Architecture Diagrams](diagrams/)
+**Visual guides to understanding agent architectures and tool-calling systems**
 
-**Benefits:**
-- ✅ Faster responses
-- ✅ Reduced API costs
-- ✅ Less load on external services
-- ✅ Better user experience
+ASCII diagrams and visual representations covering:
+- **Tool Calling Flow** - Step-by-step execution sequences
+- **Agent Architectures** - ReAct, Planner-Executor, Multi-Agent systems
+- **Protocol Comparisons** - [MCP vs UTCP visual comparison](diagrams/protocol-comparison.gif)
+- **Production Systems** - Full production architecture with monitoring
+- **Sandboxed Execution** - Security layers for tool execution
+- **Data Flow Diagrams** - Real-world agent workflows
+
+#### Diagrams
+- [Agent Architecture Patterns](diagrams/README.md#agent-architectures) - ReAct, Planner-Executor, Multi-Agent
+- [UTCP vs MCP Comparison](diagrams/protocol-comparison.gif) - Animated comparison
+- [Protocol Architecture Comparison](diagrams/README.md#protocol-comparisons) - Detailed MCP vs UTCP
+- [Production System Architecture](diagrams/README.md#production-agent-system) - Full production setup
+- [Sandboxed Tool Execution](diagrams/README.md#sandboxed-tool-execution) - Security patterns
+- [Tool Call Flow Diagrams](diagrams/README.md#tool-calling-flow) - Execution sequences
+
+#### External Resources with Diagrams
+- [ReAct Paper (arXiv)](https://arxiv.org/abs/2210.03629) - Authoritative source on reasoning + acting agents
+- [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling) - Official function calling documentation
+- [Anthropic Claude Tool Use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) - Claude's tool use patterns
+- [LangChain Agent Documentation](https://python.langchain.com/docs/modules/agents/) - Framework-specific architectures
+- [AWS AI/ML Security Best Practices](https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/security.html) - Production security patterns
 
 ---
 
-### Pattern 4: Retry with Exponential Backoff
+## 🎯 Quick Links
 
-**Problem:** Temporary failures shouldn't stop agent
+### By Use Case
+- **Building your first agent?** Start with [patterns.md](patterns.md#tool-design-patterns)
+- **Production deployment?** See [diagrams/README.md](diagrams/README.md#production-agent-system)
+- **Security concerns?** Check [patterns.md](patterns.md#security-patterns) and [anti-patterns.md](anti-patterns.md#security-anti-patterns)
+- **Performance issues?** Review [anti-patterns.md](anti-patterns.md#performance-anti-patterns)
+- **Testing strategy?** See [patterns.md](patterns.md#testing-patterns)
 
-**Solution:** Retry failed calls with increasing delays
+### By Architecture Pattern
+- [**ReAct Pattern**](diagrams/README.md#1-react-pattern) - Reasoning + Acting loop
+- [**Planner-Executor Pattern**](diagrams/README.md#2-planner-executor-pattern) - Plan then execute
+- [**Multi-Agent System**](diagrams/README.md#3-multi-agent-system-hierarchical) - Hierarchical agents
 
-```python
-import time
-from random import random
-
-def retry_with_backoff(func, max_retries=3, base_delay=1):
-    """
-    Retry function with exponential backoff
-    """
-    for attempt in range(max_retries):
-        try:
-            return func()
-        except Exception as e:
-            if attempt == max_retries - 1:
-                raise  # Last attempt, give up
-            
-            # Exponential backoff with jitter
-            delay = base_delay * (2 ** attempt) + random()
-            time.sleep(delay)
-    
-# Usage
-def call_unreliable_api():
-    response = requests.get("https://api.example.com/data")
-    response.raise_for_status()
-    return response.json()
-
-result = retry_with_backoff(call_unreliable_api, max_retries=3)
-```
-
-**Benefits:**
-- ✅ Handles transient failures
-- ✅ Avoids thundering herd (jitter)
-- ✅ Configurable retry policy
-- ✅ Eventually fails gracefully
+### Protocol Resources
+- [**MCP vs UTCP Comparison**](diagrams/protocol-comparison.gif) - Animated visual comparison
+- [**Protocol Architecture Details**](diagrams/README.md#protocol-comparisons) - When to use which protocol
+- [**UTCP Examples**](../examples/python-utcp-weather/) - Working UTCP implementation
+- [**MCP Examples**](../examples/python-mcp-files/) - Working MCP implementation
 
 ---
 
-### Pattern 5: Adapter Pattern for Multiple Protocols
+## 🏗️ Architecture Decision Records
 
-**Problem:** Want to support both UTCP and MCP tools seamlessly
+This section documents key architectural decisions made in the project:
 
-**Solution:** Adapter pattern to normalize interfaces
+### ADR-001: Hybrid Protocol Approach
+- **Decision:** Use UTCP for external public APIs, MCP for internal tools
+- **Rationale:** Optimizes for speed (UTCP) and control (MCP)
+- **Trade-off:** Increased complexity, mitigated by adapter layer
 
-```python
-class ToolAdapter:
-    def call(self, tool_name, args):
-        raise NotImplementedError
+### ADR-002: Plan-and-Execute for Structured Tasks
+- **Decision:** Use Planner-Executor pattern over pure ReAct for predictable workflows
+- **Rationale:** More efficient for multi-step tasks, better user experience
+- **Trade-off:** Less flexible, mitigated by allowing re-planning on failures
 
-class UTCPAdapter(ToolAdapter):
-    def __init__(self, client):
-        self.client = client
-    
-    def call(self, tool_name, args):
-        return self.client.call_tool(tool_name, args)
-
-class MCPAdapter(ToolAdapter):
-    def __init__(self, client):
-        self.client = client
-    
-    async def call(self, tool_name, args):
-        return await self.client.call_tool(tool_name, args)
-
-class Agent:
-    def __init__(self):
-        self.adapters = {
-            "weather": UTCPAdapter(utcp_client),
-            "database": MCPAdapter(mcp_client)
-        }
-    
-    def use_tool(self, tool_name, args):
-        adapter = self.adapters[tool_name]
-        return adapter.call(tool_name, args)
-```
-
-**Benefits:**
-- ✅ Protocol-agnostic agent code
-- ✅ Easy to switch protocols
-- ✅ Can use multiple protocols
-- ✅ Testable with mock adapters
+*See [patterns.md](patterns.md) for full ADR details*
 
 ---
 
-## 🚫 Anti-Patterns
+## 🎨 Pattern Overview
 
-### Anti-Pattern 1: Tool Overloading
-
-**❌ Bad:**
-```python
-def super_tool(action, data, mode, options, config):
-    """
-    A tool that does everything!
-    Can search, can calculate, can send emails...
-    """
-    if action == "search":
-        # 100 lines of search logic
-    elif action == "calculate":
-        # 100 lines of calculation logic
-    elif action == "email":
-        # 100 lines of email logic
-    ...
-```
-
-**✅ Good:**
-```python
-def search_tool(query):
-    """Focused tool that only searches"""
-    return perform_search(query)
-
-def calculator_tool(expression):
-    """Focused tool that only calculates"""
-    return evaluate(expression)
-
-def email_tool(to, subject, body):
-    """Focused tool that only sends emails"""
-    return send_email(to, subject, body)
-```
-
-**Why it's bad:**
-- LLM confused about when to use it
-- Hard to maintain
-- Can't optimize individually
-- Complex error handling
-
-**Rule:** One tool, one purpose
-
----
-
-### Anti-Pattern 2: Hardcoded Tool Logic in Agent
-
-**❌ Bad:**
-```python
-class Agent:
-    def process(self, query):
-        if "weather" in query:
-            # Weather API logic hardcoded here
-            response = requests.get(f"https://api.weather.com?q={query}")
-            return response.json()
-        elif "calculate" in query:
-            # Calculator logic hardcoded here
-            ...
-```
-
-**✅ Good:**
-```python
-class Agent:
-    def __init__(self, tools):
-        self.tools = tools  # Tools injected
-    
-    def process(self, query):
-        # Let LLM decide which tool
-        tool_choice = self.llm.decide(query, self.tools)
-        return self.tools[tool_choice].execute(...)
-```
-
-**Why it's bad:**
-- Can't add tools without changing agent code
-- No separation of concerns
-- Hard to test
-- Doesn't scale
-
-**Rule:** Tools are plugins, not part of agent core
+<table>
+<tr>
+<th>Category</th>
+<th>Patterns</th>
+</tr>
+<tr>
+<td><strong>Tool Design</strong></td>
+<td>
+• Tool Wrapper<br>
+• Tool Factory<br>
+• Tool Composition
+</td>
+</tr>
+<tr>
+<td><strong>Agent Architecture</strong></td>
+<td>
+• Strategy Pattern<br>
+• Chain of Responsibility<br>
+• ReAct Loop
+</td>
+</tr>
+<tr>
+<td><strong>Error Handling</strong></td>
+<td>
+• Circuit Breaker<br>
+• Retry with Backoff<br>
+• Graceful Degradation
+</td>
+</tr>
+<tr>
+<td><strong>State Management</strong></td>
+<td>
+• Memento Pattern<br>
+• Stateless Agents<br>
+• Context Management
+</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>
+• Allowlist Enforcement<br>
+• Input Validation<br>
+• Sandboxed Execution
+</td>
+</tr>
+<tr>
+<td><strong>Testing</strong></td>
+<td>
+• Test Doubles<br>
+• Mock Tools<br>
+• Error Case Testing
+</td>
+</tr>
+</table>
 
 ---
 
-### Anti-Pattern 3: Ignoring Tool Errors
+## 🚀 Getting Started
 
-**❌ Bad:**
-```python
-try:
-    result = call_tool(name, args)
-except:
-    pass  # Ignore errors, continue
-```
+### 1. **Learn the Basics**
+Start with the [Tool Calling Flow diagram](diagrams/README.md#tool-calling-flow) to understand how agents interact with tools.
 
-**✅ Good:**
-```python
-try:
-    result = call_tool(name, args)
-except ToolNotFoundError:
-    return f"Tool {name} doesn't exist"
-except ValidationError as e:
-    return f"Invalid arguments: {e}"
-except TimeoutError:
-    return f"Tool {name} timed out - trying alternative"
-except Exception as e:
-    logger.error(f"Tool error: {e}")
-    return f"Tool {name} failed: {e}"
-```
+### 2. **Study Patterns**
+Read through [patterns.md](patterns.md) to learn proven approaches for common challenges.
 
-**Why it's bad:**
-- Agent doesn't know tool failed
-- Can't recover or try alternatives
-- Poor user experience
-- No visibility into issues
+### 3. **Avoid Pitfalls**
+Review [anti-patterns.md](anti-patterns.md) to learn from common mistakes.
 
-**Rule:** Every error is information
+### 4. **See It in Action**
+Check out [working examples](../examples/) that implement these patterns.
+
+### 5. **Choose Your Architecture**
+Use the [architecture diagrams](diagrams/) to select the right pattern for your use case.
 
 ---
 
-## 📊 Architecture Decision Records
+## 🔗 External Resources
 
-### ADR-001: Choosing Between UTCP and MCP
+### Official Documentation
+- [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling)
+- [Anthropic Claude Tool Use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use)
+- [LangChain Agent Documentation](https://python.langchain.com/docs/modules/agents/)
 
-**Status:** Accepted
+### Research Papers
+- [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)
+- [Toolformer: Language Models Can Teach Themselves to Use Tools](https://arxiv.org/abs/2302.04761)
 
-**Context:**
-Need to integrate 20+ tools for our AI assistant. Mix of internal and external APIs.
-
-**Decision:**
-Use hybrid approach:
-- UTCP for external public APIs (faster, simpler)
-- MCP for internal database/auth tools (controlled, audited)
-
-**Consequences:**
-- **Positive:** Best of both worlds, optimized per tool
-- **Negative:** More complexity, two systems to maintain
-- **Mitigation:** Shared adapter layer abstracts differences
-
----
-
-### ADR-002: Agent Architecture Pattern
-
-**Status:** Accepted
-
-**Context:**
-Building customer support agent. Needs to search KB, query CRM, create tickets.
-
-**Decision:**
-Use Plan-and-Execute pattern instead of pure ReAct.
-
-**Reasoning:**
-- Tasks often have clear steps (search → query → create)
-- Planning reduces API calls (more efficient)
-- Easier to show user what agent will do
-
-**Consequences:**
-- **Positive:** More efficient, predictable
-- **Negative:** Less flexible for unexpected paths
-- **Mitigation:** Allow re-planning if step fails
-
----
-
-## 🔗 Related Resources
-
+### System Design
 - [System Design Primer](https://github.com/donnemartin/system-design-primer)
-- [Design Patterns (Gang of Four)](https://en.wikipedia.org/wiki/Design_Patterns)
-- [Cloud Design Patterns](https://docs.microsoft.com/en-us/azure/architecture/patterns/)
+- [Cloud Design Patterns (Microsoft)](https://docs.microsoft.com/en-us/azure/architecture/patterns/)
+- [AWS AI/ML Security Best Practices](https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/security.html)
 
 ---
 
-**Want to contribute a pattern?** See [CONTRIBUTING.md](../CONTRIBUTING.md)
+## 📖 Related Documentation
 
+- [**Documentation**](../docs/) - Comprehensive guides on fundamentals, architectures, and security
+- [**Examples**](../examples/) - Working code examples implementing these patterns
+- [**Protocols**](../protocols/) - UTCP and MCP specifications and tutorials
+- [**Projects**](../projects/) - Full project implementations
+
+---
+
+## 🤝 Contributing
+
+Have a pattern or anti-pattern to share? See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on:
+- Submitting new patterns
+- Adding diagrams
+- Documenting architecture decisions
+- Sharing real-world examples
+
+---
+
+## 📝 Quick Reference Checklist
+
+**Before deploying an agent, verify:**
+
+- [ ] Tools are focused and well-documented
+- [ ] Error handling returns clear success/failure
+- [ ] Credentials are never in prompts
+- [ ] Input validation on all tools
+- [ ] Max iteration limits to prevent loops
+- [ ] Error cases are tested
+- [ ] Expensive operations are cached
+- [ ] No `eval()` on untrusted input
+- [ ] State is managed cleanly
+- [ ] Security allowlists are in place
+
+*Full checklist in [anti-patterns.md](anti-patterns.md#quick-checklist)*

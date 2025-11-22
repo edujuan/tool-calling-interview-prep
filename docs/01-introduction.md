@@ -2,7 +2,7 @@
 
 ## What Are AI Agents?
 
-An **AI agent** is an AI-driven application that can perform tasks autonomously or semi-autonomously. Unlike a simple chatbot that only generates text, an agent can:
+An **AI agent** is a system that autonomously performs tasks by designing workflows with available tools.[[1]](https://www.ibm.com/think/topics/ai-agents) Unlike a simple chatbot that only generates text, an agent can:
 
 - 🔍 **Gather information** from external sources
 - ⚡ **Take actions** in the real world
@@ -11,10 +11,10 @@ An **AI agent** is an AI-driven application that can perform tasks autonomously 
 
 ## The Problem: LLMs Are Limited
 
-Large Language Models (LLMs) like GPT-4, Claude, or Llama are incredibly powerful, but they have fundamental limitations:
+Large Language Models (LLMs) like GPT-5, Claude, or Llama are incredibly powerful, but they have fundamental limitations:[[2]](https://www.oxbridgeessays.com/blog/what-are-the-limitations-of-chatgpt/)
 
 ### 1. **Static Knowledge**
-LLMs are trained on data up to a certain date. They cannot:
+LLMs are trained on data up to a certain date. They cannot:[[2]](https://www.oxbridgeessays.com/blog/what-are-the-limitations-of-chatgpt/)
 - Get today's weather
 - Check your calendar
 - Access real-time stock prices
@@ -28,11 +28,11 @@ LLMs can only generate text. They cannot:
 - Modify files or databases
 
 ### 3. **Hallucination Risk**
-When asked about things they don't know, LLMs might confidently make up answers rather than admitting uncertainty or looking up information.
+When asked about things they don't know, LLMs might confidently make up answers rather than admitting uncertainty or looking up information.[[3]](https://mitsloanedtech.mit.edu/ai/basics/addressing-ai-hallucinations-and-bias/)
 
 ## The Solution: Tool-Calling
 
-**Tool-calling** (also known as function-calling or action-taking) enables LLMs to extend their capabilities by invoking external tools, APIs, or functions.
+**Tool-calling** (also known as function-calling or action-taking) enables LLMs to extend their capabilities by invoking external tools, APIs, or functions.[[4]](https://openai.com/index/function-calling-and-other-api-updates/)
 
 ### How It Works
 
@@ -194,10 +194,10 @@ if response.choices[0].message.tool_calls:
 
 Tool-calling transforms LLMs from **knowledge bases** into **action-taking agents** that can:
 
-1. **Access Real-Time Data**: Get current information from live sources
+1. **Access Real-Time Data**: Get current information from live sources[[5]](https://www.infoq.com/news/2023/06/openai-api-function-chatgpt/)
 2. **Perform Actions**: Execute operations on behalf of users
 3. **Extend Capabilities**: Do anything a software system can do
-4. **Reduce Hallucinations**: Use verified data instead of guessing
+4. **Reduce Hallucinations**: Use verified data instead of guessing[[6]](https://mitsloanedtech.mit.edu/ai/basics/addressing-ai-hallucinations-and-bias/)
 5. **Automate Workflows**: Chain multiple operations together
 
 ## The Evolution of Tool-Calling
@@ -208,13 +208,13 @@ Tool-calling transforms LLMs from **knowledge bases** into **action-taking agent
 - Fragile and hard to maintain
 
 ### Phase 2: Function Calling APIs (2023)
-- OpenAI introduces function calling
+- OpenAI introduces function calling[[5]](https://www.infoq.com/news/2023/06/openai-api-function-chatgpt/)
 - Structured JSON outputs
 - Model-specific implementations
 
 ### Phase 3: Standard Protocols (2024-2025)
-- **MCP (Model Context Protocol)** - Anthropic's standard
-- **UTCP (Universal Tool Calling Protocol)** - Community-driven
+- **MCP (Model Context Protocol)** - Anthropic's standard[[7]](https://www.anthropic.com/news/model-context-protocol)
+- **UTCP (Universal Tool Calling Protocol)** - Community-driven[[8]](https://www.utcp.io/)
 - Vendor-agnostic approaches
 
 ## What You'll Learn Next

@@ -21,7 +21,7 @@
 
 **Problem**: Raw tools may not be safe or have the right interface for agents.
 
-**Solution**: Wrap tools with validation, error handling, and formatting.
+**Solution**: Wrap tools with validation, error handling, and formatting. [[25]](https://platform.openai.com/docs/guides/function-calling)
 
 ```python
 class ToolWrapper:
@@ -106,7 +106,7 @@ result = calculator(expression="2 + 2")  # Validated, timeout-protected
 
 **Problem**: Creating many similar tools is repetitive.
 
-**Solution**: Use a factory to generate tools from configurations.
+**Solution**: Use a factory to generate tools from configurations. This is an application of the Factory Method design pattern.[[27]](https://en.wikipedia.org/wiki/Strategy_pattern)
 
 ```python
 class ToolFactory:
@@ -186,7 +186,7 @@ read_tool = ToolFactory.create_file_tool(
 
 **Problem**: Complex operations require multiple tools.
 
-**Solution**: Create composite tools from simpler ones.
+**Solution**: Create composite tools from simpler ones. This pattern enables chaining tools to compose complex workflows from simple building blocks.
 
 ```python
 class CompositeTool:
@@ -265,7 +265,7 @@ result = weather_compare(location1="Paris", location2="London")
 
 **Problem**: Need different agent behaviors for different scenarios.
 
-**Solution**: Use strategy pattern to swap agent logic.
+**Solution**: Use strategy pattern to swap agent logic.[[28]](https://en.wikipedia.org/wiki/Strategy_pattern)
 
 ```python
 from abc import ABC, abstractmethod
@@ -354,7 +354,7 @@ agent.strategy = ReasoningStrategy(llm=openai_client)
 
 **Problem**: Multiple ways to handle a query, need to try them in order.
 
-**Solution**: Chain of handlers that pass query along if they can't handle it.
+**Solution**: Chain of handlers that pass query along if they can't handle it.[[29]](https://en.wikipedia.org/wiki/Chain-of-responsibility_pattern)
 
 ```python
 class ToolHandler(ABC):
@@ -443,7 +443,7 @@ result = math_handler.handle("Tell me a joke", {})  # GeneralHandler processes
 
 **Problem**: Failing tool can slow down entire agent.
 
-**Solution**: Circuit breaker pattern to fail fast.
+**Solution**: Circuit breaker pattern to fail fast.[[30]](https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker)
 
 ```python
 from datetime import datetime, timedelta
@@ -543,7 +543,7 @@ result = unreliable_api(query="test")
 
 **Problem**: Transient failures should be retried, but not too aggressively.
 
-**Solution**: Retry with exponentially increasing delays.
+**Solution**: Retry with exponentially increasing delays. This is a common strategy for handling transient API failures.
 
 ```python
 import time
@@ -602,7 +602,7 @@ result = call_flaky_api("https://api.example.com/data")
 
 **Problem**: Need to save and restore agent state (for debugging, rollback).
 
-**Solution**: Memento pattern to capture and restore state.
+**Solution**: Memento pattern to capture and restore state.[[31]](https://en.wikipedia.org/wiki/Memento_pattern)
 
 ```python
 from dataclasses import dataclass, field
@@ -681,7 +681,7 @@ agent.rollback(steps=1)
 
 **Problem**: Agent might call unauthorized tools or access forbidden resources.
 
-**Solution**: Explicit allowlist of permitted operations.
+**Solution**: Explicit allowlist of permitted operations. This security pattern follows the principle of least privilege.
 
 ```python
 class AllowlistEnforcer:
@@ -773,7 +773,7 @@ agent.call_tool("delete_database")  # ❌ SecurityError
 
 **Problem**: Testing agents that call external APIs is slow and expensive.
 
-**Solution**: Use test doubles (mocks/stubs) for tools.
+**Solution**: Use test doubles (mocks/stubs) for tools.[[32]](https://en.wikipedia.org/wiki/Test_double)[[33]](https://en.wikipedia.org/wiki/Test_double)
 
 ```python
 from unittest.mock import Mock

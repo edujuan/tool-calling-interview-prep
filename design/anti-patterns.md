@@ -18,7 +18,7 @@
 
 ### ❌ Anti-Pattern 1: God Tool
 
-**Problem**: One tool that does everything.
+**Problem**: One tool that does everything.[[34]](https://en.wikipedia.org/wiki/God_object)
 
 **Bad Example**:
 ```python
@@ -35,9 +35,9 @@ def do_everything(action: str, **kwargs):
 
 **Why It's Bad**:
 - Impossible for LLM to understand all capabilities
-- Hard to test and maintain
+- Hard to test and maintain[[35]](https://en.wikipedia.org/wiki/God_object)
 - Security nightmare (one tool = all permissions)
-- Poor error messages
+- Poor error messages[[36]](https://en.wikipedia.org/wiki/God_object)
 
 **Better Approach**:
 ```python
@@ -59,7 +59,7 @@ def search_web(query: str) -> list:
 
 ### ❌ Anti-Pattern 2: Silent Failures
 
-**Problem**: Tool fails but returns successful-looking result.
+**Problem**: Tool fails but returns successful-looking result. This violates the principle that errors should never pass silently.
 
 **Bad Example**:
 ```python
@@ -96,7 +96,7 @@ def get_user_data(user_id: str):
 
 ### ❌ Anti-Pattern 3: Overly Complex Parameters
 
-**Problem**: Tool requires too many parameters or nested structures.
+**Problem**: Tool requires too many parameters or nested structures. Complex interfaces are error-prone and harder to use.
 
 **Bad Example**:
 ```python
@@ -135,7 +135,7 @@ def flexible_tool(input: str, config: ToolConfig = None):
 
 ### ❌ Anti-Pattern 4: Undocumented Tools
 
-**Problem**: Tool has no description or unclear documentation.
+**Problem**: Tool has no description or unclear documentation.[[13]](https://docs.fireworks.ai/guides/function-calling)
 
 **Bad Example**:
 ```python
@@ -182,7 +182,7 @@ def process_customer_feedback(feedback_text: str,
 
 ### ❌ Anti-Pattern 5: Infinite Loop Trap
 
-**Problem**: Agent can get stuck in loops with no escape mechanism.
+**Problem**: Agent can get stuck in loops with no escape mechanism. This is a known issue in autonomous agent systems that lack proper stopping criteria.
 
 **Bad Example**:
 ```python
@@ -222,7 +222,7 @@ def agent_loop(query, max_iterations=10):
 
 ### ❌ Anti-Pattern 6: Prompt Soup
 
-**Problem**: Massive, unstructured prompts with everything thrown in.
+**Problem**: Massive, unstructured prompts with everything thrown in.[[37]](https://www.lakera.ai/blog/guide-to-prompt-injection)
 
 **Bad Example**:
 ```python
@@ -268,7 +268,7 @@ def build_structured_prompt(query, tools, history):
 
 ### ❌ Anti-Pattern 7: Stateful Chaos
 
-**Problem**: State scattered everywhere with no clear ownership.
+**Problem**: State scattered everywhere with no clear ownership. Global state makes debugging hard and prevents proper state management.
 
 **Bad Example**:
 ```python
@@ -317,7 +317,7 @@ class Agent:
 
 ### ❌ Anti-Pattern 8: Credentials in Prompts
 
-**Problem**: Putting API keys or secrets in LLM prompts.
+**Problem**: Putting API keys or secrets in LLM prompts.[[38]](https://www.guidepointsecurity.com/blog/prompt-injection-the-ai-vulnerability-we-still-cant-fix/)[[39]](https://www.guidepointsecurity.com/blog/prompt-injection-the-ai-vulnerability-we-still-cant-fix/)
 
 **Bad Example**:
 ```python
@@ -353,7 +353,7 @@ prompt = """You can use api_tool to call endpoints."""
 
 ### ❌ Anti-Pattern 9: eval() for Everything
 
-**Problem**: Using eval() to execute arbitrary code.
+**Problem**: Using eval() to execute arbitrary code.[[40]](https://dilankam.medium.com/the-god-object-anti-pattern-in-software-architecture-b2b7782d6997)
 
 **Bad Example**:
 ```python
@@ -412,7 +412,7 @@ def calculator(expression: str):
 
 ### ❌ Anti-Pattern 10: No Input Validation
 
-**Problem**: Trusting LLM output without validation.
+**Problem**: Trusting LLM output without validation.[[41]](https://docs.fireworks.ai/guides/function-calling)[[42]](https://genai.owasp.org/llmrisk2023-24/llm01-24-prompt-injection/)
 
 **Bad Example**:
 ```python
@@ -466,7 +466,7 @@ def delete_file(path: str):
 
 ### ❌ Anti-Pattern 11: Sequential When Could Parallelize
 
-**Problem**: Calling tools one-by-one when they could run in parallel.
+**Problem**: Calling tools one-by-one when they could run in parallel. Parallelizing independent tasks can yield significant performance improvements.
 
 **Bad Example**:
 ```python
@@ -499,7 +499,7 @@ async def get_all_weather(cities):
 
 ### ❌ Anti-Pattern 12: Recomputing Everything
 
-**Problem**: Calling tools repeatedly for same result.
+**Problem**: Calling tools repeatedly for same result. Caching or memoization avoids redundant computations and improves performance.
 
 **Bad Example**:
 ```python
@@ -552,7 +552,7 @@ current_time = agent.get_cached_or_fetch(
 
 ### ❌ Anti-Pattern 13: Testing in Production
 
-**Problem**: Only testing with real APIs and real data.
+**Problem**: Only testing with real APIs and real data. Proper testing requires staging environments to catch issues before production.
 
 **Bad Example**:
 ```python
@@ -596,7 +596,7 @@ def test_agent():
 
 ### ❌ Anti-Pattern 14: No Error Case Testing
 
-**Problem**: Only testing happy path.
+**Problem**: Only testing happy path. Testing best practices emphasize the importance of testing not only expected behavior but also error conditions.
 
 **Bad Example**:
 ```python

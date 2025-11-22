@@ -536,3 +536,4 @@ class DataAnalystTools:
         self.current_df = None
         self.current_file = None
 
+

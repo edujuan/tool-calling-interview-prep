@@ -1,14 +1,123 @@
 # Interview Preparation
 
-Prepare for roles involving AI agents and tool-calling systems with these comprehensive resources.
+Comprehensive resources for roles involving AI agents and tool-calling systems.
 
-## 📚 Contents
+**📊 66 Interview Questions with Detailed Answers**
 
-1. [**Common Questions**](questions.md) - Frequently asked interview questions
-2. [**Design Challenges**](design-challenges.md) - System design scenarios
-3. [**Technical Deep Dives**](technical-deep-dives.md) - In-depth technical questions
-4. [**Behavioral Questions**](behavioral.md) - Team and process questions
-5. [**Sample Answers**](answers/) - Example responses with explanations
+---
+
+## 📚 Interview Questions by Section
+
+### [01. Basics (Questions 1-20)](01-basics.md) 
+Core concepts and fundamentals of AI agents and tool-calling.
+
+**Questions:** 20 ✅  
+**Topics covered:**
+- What is an AI agent?
+- Why tool-calling is necessary
+- Function-calling vs tool-calling
+- Tool discovery and execution flow
+- Tool definitions and schemas
+- Error handling
+- Streaming and pagination
+- Performance measurement
+
+### [02. Architecture (Questions 21-23, 27-29, 31, 35-40)](02-architecture.md)
+Agent architecture patterns and design principles.
+
+**Questions:** 13 (Questions 24-26, 30, 32-34 not yet added)  
+**Topics covered:**
+- ReAct pattern
+- Loop prevention
+- Observer pattern
+- Tool retry logic
+- Tool composition and dependencies
+- Concurrent tool calls
+- Plugin systems
+- Prompt engineering for agents
+- Graceful degradation
+- Debugging strategies
+- Performance optimization
+- Anti-patterns
+
+### [03. Protocols (Questions 41-54)](03-protocols.md)
+UTCP and MCP protocols, comparison, and usage.
+
+**Questions:** 14 (Questions 55-60 not yet added)  
+**Topics covered:**
+- UTCP fundamentals
+- MCP fundamentals
+- When to use each protocol
+- Hybrid approaches
+- MCP sampling
+- Performance comparisons
+- Protocol versioning
+- OpenAPI conversion to UTCP
+- MCP resources vs tools
+- Authentication strategies (UTCP vs MCP)
+- STDIO vs HTTP transport in MCP
+- MCP prompts
+
+### [04. Security (Questions 61-71)](04-security.md)
+Security considerations and best practices for agent systems.
+
+**Questions:** 11 (Questions 72-75 not yet added)  
+**Topics covered:**
+- Main security concerns
+- Prompt injection prevention
+- API key and secret management
+- Sandboxing implementations
+- Data leakage prevention
+- Secure design principles
+- Rate limiting and abuse prevention
+- Agent-to-agent security
+- Input validation best practices
+- Secure error handling
+- Security monitoring and alerting
+
+### [05. Production (Questions 76, 81)](05-production.md)
+Deploying and operating agents in production environments.
+
+**Questions:** 2 (Questions 77-80, 82-90 not yet added)  
+**Topics covered:**
+- Monitoring and observability
+- Cost optimization
+
+**Note:** This section is incomplete. Planned topics include deployment strategies, scaling, high availability, disaster recovery, long-running tasks, A/B testing, configuration management, and incident response.
+
+### [06. Advanced (Questions 91-96)](06-advanced.md)
+Advanced topics and complex scenarios.
+
+**Questions:** 6 ✅  
+**Topics covered:**
+- Hybrid UTCP/MCP architectures
+- Comprehensive error recovery
+- Testing multi-agent systems
+- Real-time vs batch processing
+- Production observability and debugging
+- Agent collaboration patterns
+
+---
+
+## 🎯 Quick Navigation
+
+**By Difficulty:**
+- **Beginner:** Questions 1-20 (Basics)
+- **Intermediate:** Questions 21-54 (Architecture & Protocols)
+- **Advanced:** Questions 61-71, 91-96 (Security & Advanced)
+
+**By Topic:**
+- **Conceptual:** 1-20, 21-23, 41-48, 91-92
+- **Technical Implementation:** 27-40, 49-54, 61-71, 93-96
+- **Operational:** 76, 81
+
+**For Interview Prep:**
+1. Start with [Basics (1-20)](01-basics.md)
+2. Choose your focus area ([Architecture](02-architecture.md), [Protocols](03-protocols.md), or [Security](04-security.md))
+3. Review [Production questions (76, 81)](05-production.md) for monitoring and cost optimization
+4. Challenge yourself with [Advanced questions (91-96)](06-advanced.md)
+
+---
 
 ## 🎯 Interview Types
 
@@ -21,7 +130,7 @@ Prepare for roles involving AI agents and tool-calling systems with these compre
 - Basic UTCP vs MCP knowledge
 - Error handling strategies
 
-**Prepare:** [Questions 1-20](questions.md#basics)
+**Prepare:** [Basics Questions (Q1-20)](01-basics.md)
 
 ### System Design Interview (60-90 min)
 **Focus:** Architectural thinking
@@ -32,7 +141,7 @@ Prepare for roles involving AI agents and tool-calling systems with these compre
 - Scaling considerations
 - Security and reliability
 
-**Prepare:** [Design Challenges](design-challenges.md)
+**Prepare:** [Architecture Questions (Q21-40)](02-architecture.md) + [Production Questions (Q76, 81)](05-production.md)
 
 ### Coding Interview (45-60 min)
 **Focus:** Implementation skills
@@ -43,7 +152,7 @@ Prepare for roles involving AI agents and tool-calling systems with these compre
 - Error handling
 - Testing strategies
 
-**Prepare:** [Coding Challenges](coding-challenges.md)
+**Prepare:** [Basics (Q1-20)](01-basics.md) + [Architecture (Q21-40)](02-architecture.md) + [Examples](../examples/README.md)
 
 ### Deep Dive (60 min)
 **Focus:** Expert-level understanding
@@ -54,7 +163,7 @@ Prepare for roles involving AI agents and tool-calling systems with these compre
 - Advanced architectures
 - Production war stories
 
-**Prepare:** [Technical Deep Dives](technical-deep-dives.md)
+**Prepare:** [Protocols (Q41-60)](03-protocols.md) + [Advanced (Q91-96)](06-advanced.md)
 
 ## 📝 Quick Reference Sheet
 
@@ -92,209 +201,18 @@ Prepare for roles involving AI agents and tool-calling systems with these compre
 - Sandboxing tool execution
 - Rate limiting and monitoring
 
-## 🎤 Common Interview Questions
+## 📊 Progress Tracking
 
-### Beginner Level
+Track your study progress through all 66 questions:
 
-**Q: What is tool-calling in the context of AI agents?**
-<details>
-<summary>Answer</summary>
-
-Tool-calling enables LLMs to extend their capabilities by invoking external functions, APIs, or services. Since LLMs can only generate text and have frozen knowledge, tool-calling allows them to:
-- Access real-time data (weather, stock prices)
-- Perform actions (send emails, create files)
-- Execute calculations reliably
-- Query databases
-
-Example: When asked "What's the weather?", the LLM can call a weather API instead of guessing.
-</details>
-
-**Q: How does an agent decide which tool to use?**
-<details>
-<summary>Answer</summary>
-
-The LLM uses tool descriptions and the user's query to decide:
-1. Receives list of available tools with descriptions
-2. Analyzes user query to understand intent
-3. Matches query requirements to tool capabilities
-4. Selects most appropriate tool(s)
-5. Generates structured call with correct arguments
-
-The quality of tool descriptions is critical - clear, detailed descriptions lead to better tool selection.
-</details>
-
-**Q: What's the difference between UTCP and MCP?**
-<details>
-<summary>Answer</summary>
-
-**UTCP (Universal Tool Calling Protocol):**
-- Direct calls to tools using native protocols
-- Stateless, no server needed
-- Lower latency
-- Better for: Many tools, performance-critical apps
-
-**MCP (Model Context Protocol):**
-- Client-server architecture
-- Stateful sessions with context
-- Centralized control and governance
-- Better for: Enterprise needs, complex workflows
-
-Both solve the same problem differently.
-</details>
-
-### Intermediate Level
-
-**Q: Design a multi-tool agent that can search the web and send emails. What considerations are important?**
-<details>
-<summary>Answer</summary>
-
-**Architecture:**
 ```
-User Query → LLM Brain → Tool Selection → Tool Execution → Response
+Basics: □ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □ □  (0/20)
+Architecture: □ □ □ □ □ □ □ □ □ □ □ □ □  (0/13) [7 questions not yet written]
+Protocols: □ □ □ □ □ □ □ □ □ □ □ □ □ □  (0/14) [6 questions not yet written]
+Security: □ □ □ □ □ □ □ □ □ □ □  (0/11) [4 questions not yet written]
+Production: □ □  (0/2) [13 questions not yet written]
+Advanced: □ □ □ □ □ □  (0/6)
 ```
-
-**Key Considerations:**
-
-1. **Tool Discovery:** How does agent know tools exist?
-   - Static config vs. dynamic registry
-
-2. **Sequencing:** May need to chain tools
-   - Search web first, then email results
-
-3. **Error Handling:** What if search fails?
-   - Retry logic, fallbacks, user notification
-
-4. **Security:**
-   - Email tool needs authentication
-   - Prevent email spam
-   - Validate search results (prompt injection risk)
-
-5. **Permissions:**
-   - Require user approval for sending emails
-   - Read-only search access
-
-6. **Observability:**
-   - Log all tool calls
-   - Track success/failure rates
-</details>
-
-**Q: How would you handle a tool that takes 30 seconds to respond?**
-<details>
-<summary>Answer</summary>
-
-**Strategies:**
-
-1. **Async Execution:**
-   ```python
-   async def call_slow_tool():
-       task = execute_async(tool)
-       # Agent can do other things
-       result = await task
-   ```
-
-2. **Timeout Management:**
-   - Set reasonable timeout (e.g., 60s)
-   - Return error if exceeded
-   - Don't let agent hang
-
-3. **User Feedback:**
-   - Show progress indicator
-   - "Still working on it..."
-   - Set expectations upfront
-
-4. **Caching:**
-   - Cache results if queries repeat
-   - Reduce need for slow calls
-
-5. **Alternative Approaches:**
-   - Webhooks/callbacks instead of polling
-   - Background job queue
-   - Fallback to faster but less accurate tool
-</details>
-
-### Advanced Level
-
-**Q: How would you design a secure system where an AI agent can execute shell commands?**
-<details>
-<summary>Answer</summary>
-
-**Multi-Layer Security:**
-
-1. **Sandboxing:**
-   - Run in Docker container or VM
-   - Use gVisor/Firecracker for isolation
-   - Limited filesystem access
-
-2. **Command Allowlist:**
-   ```python
-   ALLOWED_COMMANDS = ['ls', 'cat', 'grep', 'find']
-   
-   def validate_command(cmd):
-       base_cmd = cmd.split()[0]
-       if base_cmd not in ALLOWED_COMMANDS:
-           raise SecurityError("Command not allowed")
-   ```
-
-3. **Argument Validation:**
-   - Sanitize inputs
-   - Prevent path traversal (../../)
-   - Block dangerous patterns (rm -rf)
-
-4. **Resource Limits:**
-   - CPU/memory limits
-   - Execution timeout
-   - Disk space quotas
-
-5. **Monitoring:**
-   - Log every command
-   - Alert on suspicious patterns
-   - Rate limiting
-
-6. **Least Privilege:**
-   - Non-root user
-   - Minimal permissions
-   - No network access if possible
-
-7. **Human-in-Loop:**
-   - Require approval for destructive operations
-   - Show preview before execution
-</details>
-
-## 🏆 Design Challenges
-
-### Challenge 1: Customer Support Agent
-
-**Scenario:** Design an AI agent that helps customer support representatives.
-
-**Requirements:**
-- Search knowledge base
-- Query customer database
-- Create support tickets
-- Send emails
-- Must be fast (<2s response time)
-- Must log all actions for compliance
-
-**What to discuss:**
-- Tool design
-- Protocol choice (UTCP vs MCP)
-- Security and privacy
-- Error handling
-- User experience
-
-[Full Challenge →](design-challenges.md#customer-support)
-
-### Challenge 2: Code Review Agent
-
-**Scenario:** Build an agent that reviews pull requests.
-
-**Requirements:**
-- Read code from GitHub
-- Run linters and tests
-- Comment on issues
-- Suggest improvements
-- Must not have write access to main branch
-
-[Full Challenge →](design-challenges.md#code-review)
 
 ## 💡 Tips for Success
 
@@ -382,21 +300,34 @@ User Query → LLM Brain → Tool Selection → Tool Execution → Response
 
 ## 🔗 Additional Resources
 
+**In This Repository:**
+- [Documentation](../docs/README.md) - In-depth guides on agents, protocols, and security
+- [Code Examples](../examples/README.md) - Working implementations to learn from
+- [UTCP Specification](../protocols/utcp/specification.md) - Complete protocol reference
+- [MCP Specification](../protocols/mcp/specification.md) - Complete protocol reference
+- [UTCP Tutorial](../protocols/utcp/tutorial.md) - Hands-on protocol guide
+
+**External Resources:**
+- [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling)
+- [Anthropic MCP Documentation](https://modelcontextprotocol.io/)
 - [System Design Interview Book](https://www.amazon.com/System-Design-Interview-insiders-Second/dp/B08CMF2CQF)
-- [LLM Function Calling Patterns](https://platform.openai.com/docs/guides/function-calling)
-- [AI Agent Security](https://martinfowler.com/articles/agentic-ai-security.html)
-
-## 🎯 Practice Problems
-
-1. **Warm-up:** Implement a basic calculator agent (30 min)
-2. **Intermediate:** Design a travel booking agent (60 min)
-3. **Advanced:** Design a multi-tenant AI platform (90 min)
-
-[All Problems →](practice-problems.md)
 
 ---
 
-**Good luck with your interviews! 🚀**
+## 🚧 Status & Roadmap
 
-Questions or suggestions? Open an [issue](https://github.com/yourusername/ai-agent-tool-calling/issues).
+**Current Status:** 66 of 96 planned questions completed  
+**Completion:** 69%
+
+**Remaining Work:**
+- 7 Architecture questions (24-26, 30, 32-34)
+- 6 Protocols questions (55-60)
+- 4 Security questions (72-75)
+- 13 Production questions (77-80, 82-90) - **Priority**
+
+**Last Updated:** November 2025  
+**Total Questions:** 66 with detailed answers (30 more planned)  
+**Estimated Study Time:** 8-12 hours for current content
+
+**Good luck with your interviews! 🚀**
 
