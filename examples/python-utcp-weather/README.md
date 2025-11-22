@@ -1,6 +1,8 @@
-# UTCP Weather Agent Example
+# UTCP Weather Agent Example (Official v1.0.1 Format)
 
-> **Real-world UTCP implementation with OpenWeatherMap API**
+> **Real-world UTCP v1.0.1 implementation with OpenWeatherMap API**
+
+**✅ Updated:** This example uses the official UTCP v1.0.1 specification format
 
 ---
 
@@ -120,62 +122,77 @@ Day 3: 14-18°C, Clear
 
 ---
 
-## UTCP Manual Structure
+## UTCP Manual Structure (v1.0.1 Format)
 
 ### Example: Current Weather Tool
 
 ```json
 {
-  "protocol": "utcp",
-  "version": "1.0",
-  "tool": {
-    "name": "get_current_weather",
-    "description": "Get current weather conditions for any city worldwide",
-    "endpoint": {
-      "url": "https://api.openweathermap.org/data/2.5/weather",
-      "method": "GET"
-    },
-    "authentication": {
-      "type": "api_key",
-      "location": "query",
-      "param_name": "appid",
-      "env_var": "OPENWEATHER_API_KEY"
-    },
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "q": {
-          "type": "string",
-          "description": "City name",
-          "required": true
+  "manual_version": "1.0.0",
+  "utcp_version": "1.0.1",
+  "info": {
+    "title": "OpenWeatherMap Current Weather API",
+    "version": "1.0.0",
+    "description": "Get current weather conditions"
+  },
+  "tools": [
+    {
+      "name": "get_current_weather",
+      "description": "Get current weather conditions for any city worldwide",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string",
+            "description": "City name, e.g., 'London' or 'New York,US'"
+          },
+          "units": {
+            "type": "string",
+            "description": "Units: metric, imperial, or standard",
+            "enum": ["metric", "imperial", "standard"],
+            "default": "metric"
+          }
         },
-        "units": {
-          "type": "string",
-          "description": "Units: metric, imperial, or standard",
-          "default": "metric"
+        "required": ["q"]
+      },
+      "tool_call_template": {
+        "call_template_type": "http",
+        "url": "https://api.openweathermap.org/data/2.5/weather",
+        "http_method": "GET",
+        "query_params": {
+          "q": "{{q}}",
+          "units": "{{units}}",
+          "appid": "${OPENWEATHER_API_KEY}"
         }
       }
     }
-  }
+  ]
 }
 ```
 
 ### Key Components
 
-1. **Endpoint** - URL and HTTP method
-2. **Authentication** - How to authenticate (API key, bearer token, etc.)
-3. **Parameters** - What inputs the tool accepts
-4. **Response** - What the tool returns
+1. **manual_version** & **utcp_version** - Protocol version info (required)
+2. **info** - Manual metadata (title, version, description)
+3. **tools** - Array of tool definitions (not single "tool" object!)
+4. **inputs** - JSON Schema for tool parameters (not "parameters")
+5. **tool_call_template** - How to call the API (not "endpoint")
+   - **call_template_type** - Protocol type ("http", "cli", etc.) - REQUIRED
+   - **http_method** - HTTP verb (not "method")
+   - **query_params** - URL parameters with template substitution
 
 ---
 
-## How It Works
+## How It Works (UTCP v1.0.1)
+
+**Note:** This example uses the official UTCP v1.0.1 specification format. See the code for the complete implementation.
 
 ### 1. Load UTCP Manual
 
 ```python
 executor = UTCPExecutor()
-executor.load_manual(WEATHER_UTCP_MANUAL)
+tool_names = executor.load_manual(WEATHER_UTCP_MANUAL)
+# Returns: ['get_current_weather']
 ```
 
 ### 2. Convert to OpenAI Format
@@ -251,47 +268,66 @@ messages.append({
 
 ## Creating Your Own UTCP Tool
 
-### Example: News API
+### Example: News API (v1.0.1 Format)
 
 ```python
 NEWS_UTCP_MANUAL = {
-    "protocol": "utcp",
-    "version": "1.0",
-    "tool": {
-        "name": "search_news",
-        "description": "Search for news articles",
-        "endpoint": {
-            "url": "https://newsapi.org/v2/everything",
-            "method": "GET"
-        },
-        "authentication": {
-            "type": "api_key",
-            "location": "header",
-            "param_name": "X-Api-Key",
-            "env_var": "NEWS_API_KEY"
-        },
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "q": {
-                    "type": "string",
-                    "description": "Search query",
-                    "required": true
+    "manual_version": "1.0.0",
+    "utcp_version": "1.0.1",
+    "info": {
+        "title": "News API",
+        "version": "1.0.0",
+        "description": "Search news articles"
+    },
+    "tools": [
+        {
+            "name": "search_news",
+            "description": "Search for news articles by keyword",
+            "inputs": {
+                "type": "object",
+                "properties": {
+                    "q": {
+                        "type": "string",
+                        "description": "Search query"
+                    },
+                    "pageSize": {
+                        "type": "integer",
+                        "description": "Number of results to return",
+                        "default": 10,
+                        "minimum": 1,
+                        "maximum": 100
+                    }
                 },
-                "pageSize": {
-                    "type": "integer",
-                    "description": "Number of results",
-                    "default": 10
+                "required": ["q"]
+            },
+            "tool_call_template": {
+                "call_template_type": "http",
+                "url": "https://newsapi.org/v2/everything",
+                "http_method": "GET",
+                "query_params": {
+                    "q": "{{q}}",
+                    "pageSize": "{{pageSize}}"
+                },
+                "headers": {
+                    "X-Api-Key": "${NEWS_API_KEY}"
                 }
             }
         }
-    }
+    ]
 }
 
 # Load and use
-executor.load_manual(NEWS_UTCP_MANUAL)
+tool_names = executor.load_manual(NEWS_UTCP_MANUAL)
 result = executor.execute("search_news", {"q": "AI", "pageSize": 5})
 ```
+
+**Key Differences from Old Format:**
+- ✅ Use `"tools": [...]` (array) not `"tool": {...}` (object)
+- ✅ Use `"inputs"` not `"parameters"`
+- ✅ Use `"tool_call_template"` not `"endpoint"`
+- ✅ Use `"http_method"` not `"method"`
+- ✅ Include `"call_template_type": "http"` (required!)
+- ✅ Auth goes in `headers` or `query_params`, not separate `"authentication"` object
 
 ---
 

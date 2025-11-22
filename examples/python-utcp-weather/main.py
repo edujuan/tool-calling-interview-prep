@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 """
-UTCP Weather Agent Example
-===========================
+UTCP Weather Agent Example (Official v1.0.1 Format)
+====================================================
 
 Demonstrates UTCP (Universal Tool Calling Protocol) with a real weather API.
 
-UTCP allows agents to call APIs directly using JSON "manual" files that describe:
-- Endpoint URLs
-- HTTP methods
-- Parameters
-- Authentication
-- Request/response formats
+This example uses the OFFICIAL UTCP v1.0.1 specification format, compatible with
+standard UTCP clients and libraries.
 
-This is simpler than MCP because:
-- No server to run
-- Direct API calls
-- Stateless
+UTCP allows agents to call APIs directly using JSON "manual" files that describe:
+- Tool definitions with inputs schema
+- HTTP call templates with URL, method, query parameters
+- Authentication via environment variables
+- Response formats
+
+Key advantages over MCP:
+- No server to run - direct API calls
+- Stateless protocol
 - Leverages existing REST APIs
+- Simple JSON configuration
 
 This example uses OpenWeatherMap API (free tier available).
+Get your API key at: https://openweathermap.org/api
 """
 
 import os
@@ -30,160 +33,240 @@ from dataclasses import dataclass
 from datetime import datetime
 
 # =============================================================================
-# UTCP MANUAL DEFINITION
+# UTCP MANUAL DEFINITION (Official v1.0.1 Format)
 # =============================================================================
 
 WEATHER_UTCP_MANUAL = {
-    "protocol": "utcp",
-    "utcp_version": "1.0.1",
     "manual_version": "1.0.0",
-    "tool": {
-        "name": "get_current_weather",
-        "description": "Get current weather conditions for any city worldwide",
-        "endpoint": {
-            "url": "https://api.openweathermap.org/data/2.5/weather",
-            "method": "GET"
-        },
-        "authentication": {
-            "type": "api_key",
-            "location": "query",
-            "param_name": "appid",
-            "env_var": "OPENWEATHER_API_KEY"
-        },
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "q": {
-                    "type": "string",
-                    "description": "City name, e.g., 'London' or 'New York,US'",
-                    "required": True
+    "utcp_version": "1.0.1",
+    "info": {
+        "title": "OpenWeatherMap Current Weather API",
+        "version": "1.0.0",
+        "description": "Get current weather conditions for any location worldwide"
+    },
+    "tools": [
+        {
+            "name": "get_current_weather",
+            "description": "Get current weather conditions for any city worldwide. Returns temperature, humidity, wind speed, and weather conditions.",
+            "inputs": {
+                "type": "object",
+                "properties": {
+                    "q": {
+                        "type": "string",
+                        "description": "City name, e.g., 'London' or 'New York,US' or coordinates 'lat,lon'"
+                    },
+                    "units": {
+                        "type": "string",
+                        "description": "Units of measurement: 'metric' (Celsius), 'imperial' (Fahrenheit), or 'standard' (Kelvin)",
+                        "enum": ["metric", "imperial", "standard"],
+                        "default": "metric"
+                    }
                 },
-                "units": {
-                    "type": "string",
-                    "description": "Units of measurement: 'metric' (Celsius), 'imperial' (Fahrenheit), or 'standard' (Kelvin)",
-                    "default": "metric",
-                    "enum": ["metric", "imperial", "standard"]
+                "required": ["q"]
+            },
+            "tool_call_template": {
+                "call_template_type": "http",
+                "url": "https://api.openweathermap.org/data/2.5/weather",
+                "http_method": "GET",
+                "query_params": {
+                    "q": "{{q}}",
+                    "units": "{{units}}",
+                    "appid": "${OPENWEATHER_API_KEY}"
                 }
+            },
+            "response_schema": {
+                "type": "object",
+                "description": "Weather data including temperature, conditions, humidity, wind, etc."
             }
-        },
-        "response": {
-            "type": "object",
-            "description": "Weather data including temperature, conditions, humidity, etc."
         }
-    }
+    ]
 }
 
 FORECAST_UTCP_MANUAL = {
-    "protocol": "utcp",
-    "utcp_version": "1.0.1",
     "manual_version": "1.0.0",
-    "tool": {
-        "name": "get_weather_forecast",
-        "description": "Get 5-day weather forecast with 3-hour intervals for any city",
-        "endpoint": {
-            "url": "https://api.openweathermap.org/data/2.5/forecast",
-            "method": "GET"
-        },
-        "authentication": {
-            "type": "api_key",
-            "location": "query",
-            "param_name": "appid",
-            "env_var": "OPENWEATHER_API_KEY"
-        },
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "q": {
-                    "type": "string",
-                    "description": "City name",
-                    "required": True
+    "utcp_version": "1.0.1",
+    "info": {
+        "title": "OpenWeatherMap Forecast API",
+        "version": "1.0.0",
+        "description": "Get 5-day weather forecast with 3-hour intervals"
+    },
+    "tools": [
+        {
+            "name": "get_weather_forecast",
+            "description": "Get 5-day weather forecast with 3-hour intervals for any city. Returns list of forecasts with temperature, conditions, and timestamps.",
+            "inputs": {
+                "type": "object",
+                "properties": {
+                    "q": {
+                        "type": "string",
+                        "description": "City name, e.g., 'London' or 'New York,US'"
+                    },
+                    "units": {
+                        "type": "string",
+                        "description": "Units of measurement: 'metric', 'imperial', or 'standard'",
+                        "enum": ["metric", "imperial", "standard"],
+                        "default": "metric"
+                    },
+                    "cnt": {
+                        "type": "integer",
+                        "description": "Number of forecast entries to return (max 40, ~5 days with 3-hour intervals)",
+                        "default": 8,
+                        "minimum": 1,
+                        "maximum": 40
+                    }
                 },
-                "units": {
-                    "type": "string",
-                    "description": "Units of measurement",
-                    "default": "metric",
-                    "enum": ["metric", "imperial", "standard"]
-                },
-                "cnt": {
-                    "type": "integer",
-                    "description": "Number of forecast entries to return (max 40)",
-                    "default": 8
+                "required": ["q"]
+            },
+            "tool_call_template": {
+                "call_template_type": "http",
+                "url": "https://api.openweathermap.org/data/2.5/forecast",
+                "http_method": "GET",
+                "query_params": {
+                    "q": "{{q}}",
+                    "units": "{{units}}",
+                    "cnt": "{{cnt}}",
+                    "appid": "${OPENWEATHER_API_KEY}"
                 }
+            },
+            "response_schema": {
+                "type": "object",
+                "description": "List of weather forecasts with timestamps"
             }
-        },
-        "response": {
-            "type": "object",
-            "description": "List of weather forecasts with timestamps"
         }
-    }
+    ]
 }
 
 # =============================================================================
-# UTCP EXECUTOR
+# UTCP EXECUTOR (UTCP v1.0.1 Compatible)
 # =============================================================================
 
 class UTCPExecutor:
-    """Executes tools defined by UTCP manuals"""
+    """Executes tools defined by UTCP v1.0.1 manuals"""
     
     def __init__(self):
-        self.manuals: Dict[str, Dict] = {}
+        self.tools: Dict[str, Dict] = {}  # tool_name -> tool definition
+        self.manuals: Dict[str, Dict] = {}  # tool_name -> full manual
     
-    def load_manual(self, manual: Dict) -> str:
+    def load_manual(self, manual: Dict) -> List[str]:
         """
-        Load a UTCP manual and register the tool.
+        Load a UTCP v1.0.1 manual and register all tools.
+        
+        Args:
+            manual: UTCP manual dictionary with 'tools' array
         
         Returns:
-            Tool name
+            List of tool names loaded
         """
-        tool_name = manual['tool']['name']
-        self.manuals[tool_name] = manual
-        return tool_name
+        tool_names = []
+        
+        # Validate manual structure
+        if "tools" not in manual:
+            raise ValueError("Invalid UTCP manual: missing 'tools' array")
+        
+        if not isinstance(manual["tools"], list):
+            raise ValueError("Invalid UTCP manual: 'tools' must be an array")
+        
+        # Load each tool
+        for tool in manual["tools"]:
+            tool_name = tool["name"]
+            self.tools[tool_name] = tool
+            self.manuals[tool_name] = manual
+            tool_names.append(tool_name)
+        
+        return tool_names
     
     def execute(self, tool_name: str, parameters: Dict[str, Any]) -> str:
         """
         Execute a UTCP tool.
         
         Args:
-            tool_name: Name of the tool from manual
-            parameters: Tool parameters
+            tool_name: Name of the tool
+            parameters: Tool parameters (will be substituted into template)
         
         Returns:
             JSON string with result or error
         """
-        if tool_name not in self.manuals:
+        if tool_name not in self.tools:
             return json.dumps({"error": f"Tool '{tool_name}' not found"})
         
-        manual = self.manuals[tool_name]
-        tool = manual['tool']
+        tool = self.tools[tool_name]
         
         try:
-            # Build request
-            url = tool['endpoint']['url']
-            method = tool['endpoint']['method']
+            # Get call template
+            call_template = tool["tool_call_template"]
+            call_type = call_template["call_template_type"]
             
-            # Handle authentication
-            if 'authentication' in tool:
-                auth = tool['authentication']
-                if auth['type'] == 'api_key':
-                    api_key = os.getenv(auth['env_var'])
-                    if not api_key:
-                        return json.dumps({
-                            "error": f"API key not found. Set {auth['env_var']} environment variable"
-                        })
-                    
-                    if auth['location'] == 'query':
-                        parameters[auth['param_name']] = api_key
-                    elif auth['location'] == 'header':
-                        # Would add to headers
-                        pass
+            if call_type != "http":
+                return json.dumps({"error": f"Unsupported call_template_type: {call_type}"})
             
-            # Make request
-            if method == 'GET':
-                response = requests.get(url, params=parameters, timeout=10)
-            elif method == 'POST':
-                response = requests.post(url, json=parameters, timeout=10)
+            # Build HTTP request
+            url = call_template["url"]
+            method = call_template["http_method"]
+            
+            # Prepare query parameters with template substitution
+            query_params = {}
+            if "query_params" in call_template:
+                for key, value_template in call_template["query_params"].items():
+                    # Substitute {{parameter}} from inputs
+                    if isinstance(value_template, str):
+                        if value_template.startswith("{{") and value_template.endswith("}}"):
+                            param_name = value_template[2:-2]
+                            if param_name in parameters:
+                                query_params[key] = parameters[param_name]
+                            # Skip if parameter not provided (might be optional)
+                        elif value_template.startswith("${") and value_template.endswith("}"):
+                            # Environment variable
+                            env_var = value_template[2:-1]
+                            env_value = os.getenv(env_var)
+                            if not env_value:
+                                return json.dumps({
+                                    "error": f"Environment variable {env_var} not set"
+                                })
+                            query_params[key] = env_value
+                        else:
+                            # Static value
+                            query_params[key] = value_template
+                    else:
+                        query_params[key] = value_template
+            
+            # Prepare headers
+            headers = {}
+            if "headers" in call_template:
+                for key, value in call_template["headers"].items():
+                    if isinstance(value, str) and value.startswith("${") and value.endswith("}"):
+                        env_var = value[2:-1]
+                        env_value = os.getenv(env_var)
+                        if env_value:
+                            headers[key] = env_value
+                    else:
+                        headers[key] = value
+            
+            # Prepare body (for POST/PUT)
+            body = None
+            if "body_template" in call_template:
+                body = {}
+                for key, value_template in call_template["body_template"].items():
+                    if isinstance(value_template, str):
+                        if value_template.startswith("{{") and value_template.endswith("}}"):
+                            param_name = value_template[2:-2]
+                            if param_name in parameters:
+                                body[key] = parameters[param_name]
+                        else:
+                            body[key] = value_template
+                    else:
+                        body[key] = value_template
+            
+            # Make HTTP request
+            if method == "GET":
+                response = requests.get(url, params=query_params, headers=headers, timeout=10)
+            elif method == "POST":
+                response = requests.post(url, params=query_params, json=body, headers=headers, timeout=10)
+            elif method == "PUT":
+                response = requests.put(url, params=query_params, json=body, headers=headers, timeout=10)
+            elif method == "DELETE":
+                response = requests.delete(url, params=query_params, headers=headers, timeout=10)
             else:
-                return json.dumps({"error": f"Unsupported method: {method}"})
+                return json.dumps({"error": f"Unsupported HTTP method: {method}"})
             
             # Check response
             response.raise_for_status()
@@ -192,49 +275,49 @@ class UTCPExecutor:
         
         except requests.exceptions.RequestException as e:
             return json.dumps({"error": f"API request failed: {str(e)}"})
+        except KeyError as e:
+            return json.dumps({"error": f"Invalid UTCP manual structure: missing {str(e)}"})
         except Exception as e:
             return json.dumps({"error": f"Execution failed: {str(e)}"})
     
     def get_openai_tools(self) -> List[Dict]:
-        """Convert UTCP manuals to OpenAI function calling format"""
+        """Convert UTCP tools to OpenAI function calling format"""
         tools = []
         
-        for tool_name, manual in self.manuals.items():
-            tool = manual['tool']
-            
-            # Build parameters schema
+        for tool_name, tool in self.tools.items():
+            # Build parameters schema from inputs
             params_schema = {
                 "type": "object",
                 "properties": {},
                 "required": []
             }
             
-            for param_name, param_def in tool['parameters']['properties'].items():
-                # Skip auth parameters (handled internally)
-                if 'authentication' in tool:
-                    auth = tool['authentication']
-                    if param_name == auth.get('param_name'):
-                        continue
+            if "inputs" in tool:
+                inputs = tool["inputs"]
                 
-                params_schema['properties'][param_name] = {
-                    "type": param_def['type'],
-                    "description": param_def['description']
-                }
+                # Copy properties
+                if "properties" in inputs:
+                    for param_name, param_def in inputs["properties"].items():
+                        params_schema["properties"][param_name] = {
+                            "type": param_def.get("type", "string"),
+                            "description": param_def.get("description", "")
+                        }
+                        
+                        if "enum" in param_def:
+                            params_schema["properties"][param_name]["enum"] = param_def["enum"]
+                        
+                        if "default" in param_def:
+                            params_schema["properties"][param_name]["default"] = param_def["default"]
                 
-                if param_def.get('enum'):
-                    params_schema['properties'][param_name]['enum'] = param_def['enum']
-                
-                if param_def.get('default'):
-                    params_schema['properties'][param_name]['default'] = param_def['default']
-                
-                if param_def.get('required', False):
-                    params_schema['required'].append(param_name)
+                # Copy required fields
+                if "required" in inputs:
+                    params_schema["required"] = inputs["required"]
             
             tools.append({
                 "type": "function",
                 "function": {
                     "name": tool_name,
-                    "description": tool['description'],
+                    "description": tool.get("description", ""),
                     "parameters": params_schema
                 }
             })
@@ -255,15 +338,15 @@ class WeatherAgent:
         # Store API key in environment (UTCP executor reads from env)
         os.environ['OPENWEATHER_API_KEY'] = openweather_api_key
         
-        # Load UTCP manuals
-        self.utcp_executor.load_manual(WEATHER_UTCP_MANUAL)
-        self.utcp_executor.load_manual(FORECAST_UTCP_MANUAL)
+        # Load UTCP manuals (v1.0.1 format)
+        weather_tools = self.utcp_executor.load_manual(WEATHER_UTCP_MANUAL)
+        forecast_tools = self.utcp_executor.load_manual(FORECAST_UTCP_MANUAL)
         
         self.conversation_history: List[Dict] = []
         
-        print("✓ Weather Agent initialized with UTCP tools:")
-        print("  - get_current_weather")
-        print("  - get_weather_forecast")
+        print("✓ Weather Agent initialized with UTCP v1.0.1 tools:")
+        for tool in weather_tools + forecast_tools:
+            print(f"  - {tool}")
     
     def chat(self, user_message: str, verbose: bool = True) -> str:
         """

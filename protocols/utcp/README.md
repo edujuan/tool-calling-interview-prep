@@ -62,7 +62,18 @@ The heart of UTCP is the **manual** - a JSON document that describes how to call
 
 ### Call Templates
 
-UTCP supports multiple transport types via call templates. This flexibility allows UTCP to work with virtually any tool interface, from standard REST APIs to real-time streaming protocols.
+UTCP v1.0.1 supports multiple transport types via call templates through a plugin architecture. This flexibility allows UTCP to work with virtually any tool interface, from standard REST APIs to real-time streaming protocols.
+
+**Officially Supported Protocols (v1.0.1):**
+- HTTP/REST (`utcp-http`)
+- Server-Sent Events (`utcp-http`)
+- Streamable HTTP (`utcp-http`)
+- Command-Line Interface (`utcp-cli`)
+- WebSocket (`utcp-websocket`)
+- MCP Integration (`utcp-mcp`)
+- Text/Local Files (`utcp-text`)
+
+**Installation:** `pip install utcp` (core) plus protocol plugins as needed
 
 #### 1. HTTP/REST
 ```json
@@ -79,6 +90,8 @@ UTCP supports multiple transport types via call templates. This flexibility allo
 }
 ```
 
+**Installation:** `pip install utcp-http`
+
 #### 2. CLI (Command-Line)
 ```json
 {
@@ -92,26 +105,9 @@ UTCP supports multiple transport types via call templates. This flexibility allo
 }
 ```
 
-#### 3. GraphQL
-```json
-{
-  "call_template_type": "graphql",
-  "url": "https://api.example.com/graphql",
-  "query": "query { user(id: {{user_id}}) { name email } }"
-}
-```
+**Installation:** `pip install utcp-cli`
 
-#### 4. gRPC
-```json
-{
-  "call_template_type": "grpc",
-  "service": "UserService",
-  "method": "GetUser",
-  "endpoint": "api.example.com:443"
-}
-```
-
-#### 5. WebSocket
+#### 3. WebSocket
 ```json
 {
   "call_template_type": "websocket",
@@ -127,7 +123,9 @@ UTCP supports multiple transport types via call templates. This flexibility allo
 }
 ```
 
-#### 6. Server-Sent Events (SSE)
+**Installation:** `pip install utcp-websocket`
+
+#### 4. Server-Sent Events (SSE)
 ```json
 {
   "call_template_type": "sse",
@@ -142,7 +140,21 @@ UTCP supports multiple transport types via call templates. This flexibility allo
 }
 ```
 
-#### 7. MCP (Yes, UTCP can call MCP!)
+**Installation:** `pip install utcp-http` (SSE is part of HTTP plugin)
+
+#### 5. Streamable HTTP
+```json
+{
+  "call_template_type": "streamable_http",
+  "url": "https://api.example.com/download/{file_id}",
+  "http_method": "GET",
+  "chunk_size": 4096
+}
+```
+
+**Installation:** `pip install utcp-http` (Streamable HTTP is part of HTTP plugin)
+
+#### 6. MCP Integration
 ```json
 {
   "call_template_type": "mcp",
@@ -150,6 +162,20 @@ UTCP supports multiple transport types via call templates. This flexibility allo
   "tool_name": "internal_tool"
 }
 ```
+
+**Installation:** `pip install utcp-mcp`  
+**Note:** UTCP can call MCP servers, enabling gradual migration from MCP to UTCP.
+
+#### 7. Text/Local Files
+```json
+{
+  "call_template_type": "text",
+  "file_path": "/path/to/utcp_manual.json"
+}
+```
+
+**Installation:** `pip install utcp-text`  
+**Use case:** Load UTCP manuals from local files or OpenAPI specifications.
 
 ## 🚀 How It Works
 
@@ -195,12 +221,12 @@ Here's a full UTCP manual with multiple tools:
 
 ```json
 {
-  "utcp_version": "1.0.1",
   "manual_version": "2.1.0",
-  "metadata": {
+  "utcp_version": "1.0.1",
+  "info": {
     "title": "Example Service Tools",
-    "description": "Tools for interacting with Example Service",
-    "tags": ["weather", "maps", "search"]
+    "version": "2.1.0",
+    "description": "Tools for interacting with Example Service"
   },
   "auth": {
     "auth_type": "api_key",
@@ -483,9 +509,20 @@ print(result)  # {"temp": 18, "condition": "cloudy"}
 
 ### Official UTCP Implementations
 
-**Python**
+**Python** (Plugin Architecture)
 ```bash
+# Core library (required)
 pip install utcp
+
+# Protocol plugins (install as needed)
+pip install utcp-http      # HTTP, SSE, Streamable HTTP
+pip install utcp-cli       # Command-line tools
+pip install utcp-websocket # WebSocket support
+pip install utcp-mcp       # MCP integration
+pip install utcp-text      # Local file manuals
+
+# Install all protocols
+pip install utcp[all]
 ```
 
 **TypeScript/JavaScript**
