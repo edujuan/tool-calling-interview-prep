@@ -26,9 +26,14 @@
         "url": "https://api.openweathermap.org/data/2.5/weather",
         "http_method": "GET",
         "query_params": {
-          "q": "${q}",
-          "units": "${units}",
-          "appid": "${OPENWEATHER_API_KEY}"
+          "q": "{q}",
+          "units": "{units}"
+        },
+        "auth": {
+          "auth_type": "api_key",
+          "api_key": "$OPENWEATHER_API_KEY",
+          "var_name": "appid",
+          "location": "query"
         }
       }
     },
@@ -63,10 +68,15 @@
         "url": "https://api.openweathermap.org/data/2.5/forecast",
         "http_method": "GET",
         "query_params": {
-          "q": "${q}",
-          "units": "${units}",
-          "cnt": "${cnt}",
-          "appid": "${OPENWEATHER_API_KEY}"
+          "q": "{q}",
+          "units": "{units}",
+          "cnt": "{cnt}"
+        },
+        "auth": {
+          "auth_type": "api_key",
+          "api_key": "$OPENWEATHER_API_KEY",
+          "var_name": "appid",
+          "location": "query"
         }
       }
     }

@@ -53,7 +53,8 @@ class WeatherAgent:
         # Set environment variable for UTCP to use
         os.environ['OPENWEATHER_API_KEY'] = self.openweather_api_key
         
-        # Create UTCP configuration with TextCallTemplate
+        # Create UTCP configuration - variables must be prefixed with manual name!
+        # Format: {manual_name}__{variable_name} (double underscore)
         config = UtcpClientConfig(
             manual_call_templates=[
                 TextCallTemplate(
@@ -62,7 +63,7 @@ class WeatherAgent:
                 )
             ],
             variables={
-                "OPENWEATHER_API_KEY": self.openweather_api_key
+                "weather__tools_OPENWEATHER_API_KEY": self.openweather_api_key
             }
         )
         
