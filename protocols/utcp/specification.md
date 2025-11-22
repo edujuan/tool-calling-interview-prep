@@ -90,7 +90,7 @@ class Agent:
         """Run agent with UTCP tools"""
         
         # Get available tools
-        tools = await self.utcp_client.get_tools()
+        tools = await self.utcp_client.search_tools(query="", limit=100)
         
         # LLM decides which tool to use
         decision = await self.llm.decide(query, available_tools=tools)
@@ -184,9 +184,14 @@ interface UTCPManual {
         "url": "https://api.openweathermap.org/data/2.5/weather",
         "http_method": "GET",
         "query_params": {
-          "q": "${location}",
-          "units": "${units}",
-          "appid": "${WEATHER_API_KEY}"
+          "q": "{location}",
+          "units": "{units}"
+        },
+        "auth": {
+          "auth_type": "api_key",
+          "api_key": "$WEATHER_API_KEY",
+          "var_name": "appid",
+          "location": "query"
         }
       }
     }
@@ -785,18 +790,17 @@ async def main():
     print("✓ Client created successfully")
     
     # Get all tools
-    tools = await client.get_tools()
+    tools = await client.search_tools(query="", limit=100)
     print(f"Available tools: {[t.name for t in tools]}")
     
-    # Get specific tool info
-    tool = await client.get_tool("get_current_weather")
-    print(f"Tool: {tool.name}")
+    # Note: Tool names are prefixed with manual name
+    # e.g., "weather_manual.get_current_weather"
     print(f"Description: {tool.description}")
     print(f"Inputs: {tool.inputs}")
     
-    # Call tool
+    # Call tool (use full name with prefix)
     result = await client.call_tool(
-        "get_current_weather",
+        "weather_manual.get_current_weather",
         {"location": "Paris", "units": "metric"}
     )
     print(f"Result: {result}")
@@ -854,7 +858,7 @@ config = UtcpClientConfig(
 client = await UtcpClient.create(config=config)
 
 # Get all tools from all manuals
-all_tools = await client.get_tools()
+all_tools = await client.search_tools(query="", limit=100)
 print(f"Total tools available: {len(all_tools)}")
 ```
 
@@ -925,7 +929,7 @@ async def setup_langchain_agent(llm):
     client = await UtcpClient.create(config=config)
     
     # Convert UTCP tools to LangChain tools
-    utcp_tools = await client.get_tools()
+    utcp_tools = await client.search_tools(query="", limit=100)
     langchain_tools = []
     
     for tool in utcp_tools:

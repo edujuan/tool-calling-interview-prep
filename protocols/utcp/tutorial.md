@@ -101,7 +101,12 @@ Add the current weather tool:
         "query_params": {
           "q": "${location}",
           "units": "${units}",
-          "appid": "${WEATHER_API_KEY}"
+        },
+        "auth": {
+          "auth_type": "api_key",
+          "api_key": "$WEATHER_API_KEY",
+          "var_name": "appid",
+          "location": "query"
         }
       }
     }
@@ -164,7 +169,12 @@ Add global authentication configuration:
         "query_params": {
           "q": "${location}",
           "units": "${units}",
-          "appid": "${WEATHER_API_KEY}"
+        },
+        "auth": {
+          "auth_type": "api_key",
+          "api_key": "$WEATHER_API_KEY",
+          "var_name": "appid",
+          "location": "query"
         }
       }
     }
@@ -214,15 +224,15 @@ async def test_weather():
     print(f"   Client initialized with weather tools")
     print()
     
-    # List available tools
-    tools = await client.get_tools()
+    # List available tools (search_tools with empty query returns all)
+    tools = await client.search_tools(query="", limit=100)
     print("🔧 Available Tools:")
     for tool in tools:
         print(f"   - {tool.name}: {tool.description}")
     print()
-    
-    # Get tool details
-    tool = await client.get_tool("get_current_weather")
+
+    # Note: Tool names are prefixed with manual name
+    # For manual named "weather_manual", full name is "weather_manual.get_current_weather"
     print("📖 Tool Details:")
     print(f"   Name: {tool.name}")
     print(f"   Inputs: {list(tool.inputs['properties'].keys())}")
@@ -536,7 +546,7 @@ class WeatherClient:
             )
             
             self.client = await UtcpClient.create(config=config)
-            tools = await self.client.get_tools()
+            tools = await self.client.search_tools(query="", limit=100)
             print(f"✅ Loaded {len(tools)} weather tools")
         except FileNotFoundError:
             print("❌ Error: weather_manual.json not found")
@@ -649,7 +659,7 @@ async def weather_agent(query: str):
     utcp = await UtcpClient.create(config=config)
     
     # Get tools for Claude
-    tools = await utcp.get_tools()
+    tools = await utcp.search_tools(query="", limit=100)
     claude_tools = []
     
     for tool in tools:
@@ -796,10 +806,15 @@ Your final `weather_manual.json`:
         "url": "https://api.openweathermap.org/data/2.5/forecast",
         "http_method": "GET",
         "query_params": {
-          "q": "${location}",
-          "units": "${units}",
-          "cnt": "${days}",
-          "appid": "${WEATHER_API_KEY}"
+          "q": "{location}",
+          "units": "{units}",
+          "cnt": "{days}"
+        },
+        "auth": {
+          "auth_type": "api_key",
+          "api_key": "$WEATHER_API_KEY",
+          "var_name": "appid",
+          "location": "query"
         }
       }
     },
@@ -825,9 +840,14 @@ Your final `weather_manual.json`:
         "url": "https://api.openweathermap.org/geo/1.0/direct",
         "http_method": "GET",
         "query_params": {
-          "q": "${query}",
-          "limit": "${limit}",
-          "appid": "${WEATHER_API_KEY}"
+          "q": "{query}",
+          "limit": "{limit}"
+        },
+        "auth": {
+          "auth_type": "api_key",
+          "api_key": "$WEATHER_API_KEY",
+          "var_name": "appid",
+          "location": "query"
         }
       }
     }

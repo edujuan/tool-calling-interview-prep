@@ -48,11 +48,14 @@ The heart of UTCP is the **manual** - a JSON document that describes how to call
         "url": "https://api.weather.com/v1/current",
         "http_method": "GET",
         "query_params": {
-          "q": "{{location}}",
-          "units": "{{units|default:metric}}"
+          "q": "{location}",
+          "units": "{units}"
         },
-        "headers": {
-          "Authorization": "Bearer ${WEATHER_API_KEY}"
+        "auth": {
+          "auth_type": "api_key",
+          "api_key": "$WEATHER_API_KEY",
+          "var_name": "Authorization",
+          "location": "header"
         }
       }
     }
@@ -305,11 +308,14 @@ Here's a full UTCP manual with multiple tools:
         "url": "https://api.example.com/v1/weather/current",
         "http_method": "GET",
         "query_params": {
-          "q": "{{location}}",
-          "units": "{{units|default:metric}}"
+          "q": "{location}",
+          "units": "{units}"
         },
-        "headers": {
-          "Authorization": "Bearer ${EXAMPLE_API_KEY}"
+        "auth": {
+          "auth_type": "api_key",
+          "api_key": "$EXAMPLE_API_KEY",
+          "var_name": "Authorization",
+          "location": "header"
         }
       }
     }
@@ -422,7 +428,7 @@ toolkit = UTCPToolkit.from_manual("./tools.json")
 
 # Create agent
 agent = initialize_agent(
-    toolkit.get_tools(),
+    # Note: Use search_tools(query="", limit=100) to get all tools
     llm,
     agent="zero-shot-react-description"
 )
@@ -446,9 +452,9 @@ tool_info = client.get_tool_info("get_weather")
 print(tool_info.description)
 print(tool_info.parameters)
 
-# Call a tool
+# Call a tool (use full name with manual prefix)
 result = client.call_tool(
-    "get_weather",
+    "weather_manual.get_weather",
     {"location": "Paris", "units": "metric"}
 )
 print(result)  # {"temp": 18, "condition": "cloudy"}
