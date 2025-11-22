@@ -1,0 +1,114 @@
+# AI Agent Tool-Calling - Complete Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core LLM & Agent Frameworks
+openai>=1.3.0
+anthropic>=0.8.0
+langchain>=0.1.0
+langchain-community>=0.0.10
+langchain-openai>=0.0.2
+
+# Agent Frameworks (Optional but recommended)
+# AutoGen for multi-agent systems
+# pyautogen>=0.2.0
+
+# UTCP & MCP Support
+# utcp>=0.1.0  # Uncomment when package is available
+# mcp>=0.1.0   # Uncomment when package is available
+
+# HTTP & API Tools
+requests>=2.31.0
+httpx>=0.25.0
+aiohttp>=3.9.0
+
+# Data Processing
+pandas>=2.1.0
+numpy>=1.24.0
+
+# JSON & Schema Validation
+jsonschema>=4.20.0
+pydantic>=2.5.0
+
+# Environment & Configuration
+python-dotenv>=1.0.0
+
+# Time & Date
+pytz>=2023.3
+python-dateutil>=2.8.2
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+
+# Mocking & Testing Utilities
+responses>=0.24.0
+faker>=20.1.0
+
+# Security & Sandboxing
+docker>=7.0.0  # For container-based sandboxing
+
+# Logging & Monitoring
+structlog>=23.2.0
+python-json-logger>=2.0.7
+
+# Performance & Async
+asyncio>=3.4.3
+tenacity>=8.2.3  # Retry logic
+
+# Database Connectors (Optional)
+# psycopg2-binary>=2.9.9  # PostgreSQL
+# pymongo>=4.6.0  # MongoDB
+# redis>=5.0.1  # Redis
+
+# Web Scraping (Optional)
+# beautifulsoup4>=4.12.2
+# selenium>=4.16.0
+
+# NLP & Text Processing (Optional)
+# spacy>=3.7.2
+# nltk>=3.8.1
+# sentence-transformers>=2.2.2
+
+# Vector Databases (Optional)
+# chromadb>=0.4.18
+# pinecone-client>=2.2.4
+# weaviate-client>=3.25.3
+
+# API Development (Optional)
+# fastapi>=0.108.0
+# uvicorn>=0.25.0
+
+# Code Execution & Validation
+ast>=0.0.1  # Built-in, but listed for completeness
+
+# Secrets Management
+# hvac>=2.0.0  # HashiCorp Vault client
+# boto3>=1.34.0  # AWS SDK (for Secrets Manager)
+
+# Jupyter Notebook Support (Development)
+jupyter>=1.0.0
+ipython>=8.18.0
+
+# Type Checking (Development)
+mypy>=1.7.0
+types-requests>=2.31.0
+
+# Code Formatting (Development)
+black>=23.12.0
+isort>=5.13.0
+flake8>=6.1.0
+
+# Documentation (Development)
+mkdocs>=1.5.3
+mkdocs-material>=9.5.0
+
+# Note: Some packages are commented out to keep base installation minimal.
+# Uncomment based on your specific needs.
+#
+# Minimal install (core functionality):
+#   pip install openai langchain requests python-dotenv pytest
+#
+# Development install (everything):
+#   pip install -r requirements.txt

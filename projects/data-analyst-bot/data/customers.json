@@ -1,0 +1,38 @@
+[
+  {
+    "customer_id": "C001",
+    "name": "Alice Johnson",
+    "email": "alice@example.com",
+    "signup_date": "2023-06-15",
+    "loyalty_tier": "Gold"
+  },
+  {
+    "customer_id": "C002",
+    "name": "Bob Smith",
+    "email": "bob@example.com",
+    "signup_date": "2023-08-22",
+    "loyalty_tier": "Silver"
+  },
+  {
+    "customer_id": "C003",
+    "name": "Carol Williams",
+    "email": "carol@example.com",
+    "signup_date": "2023-09-10",
+    "loyalty_tier": "Gold"
+  },
+  {
+    "customer_id": "C004",
+    "name": "David Brown",
+    "email": "david@example.com",
+    "signup_date": "2023-10-05",
+    "loyalty_tier": "Bronze"
+  },
+  {
+    "customer_id": "C005",
+    "name": "Eva Martinez",
+    "email": "eva@example.com",
+    "signup_date": "2023-11-12",
+    "loyalty_tier": "Silver"
+  }
+]
+

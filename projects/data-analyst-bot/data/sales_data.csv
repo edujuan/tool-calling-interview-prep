@@ -1,0 +1,32 @@
+date,product,category,quantity,price,customer_id,region,payment_method
+2024-01-01,Laptop,Electronics,1,999.99,C001,North,Credit Card
+2024-01-01,Mouse,Electronics,2,24.99,C002,South,PayPal
+2024-01-02,T-Shirt,Clothing,3,19.99,C003,East,Credit Card
+2024-01-02,Desk Chair,Home & Garden,1,249.99,C001,North,Credit Card
+2024-01-03,Running Shoes,Sports,1,89.99,C004,West,Debit Card
+2024-01-03,Keyboard,Electronics,1,79.99,C005,North,PayPal
+2024-01-04,Novel,Books,2,14.99,C002,South,Credit Card
+2024-01-04,Desk Lamp,Home & Garden,1,39.99,C006,East,Credit Card
+2024-01-05,Jeans,Clothing,2,59.99,C003,East,PayPal
+2024-01-05,Smartphone,Electronics,1,699.99,C007,West,Credit Card
+2024-01-06,Water Bottle,Sports,3,19.99,C004,West,Debit Card
+2024-01-06,Headphones,Electronics,1,149.99,C008,North,Credit Card
+2024-01-07,Cookbook,Books,1,24.99,C009,South,PayPal
+2024-01-07,Sweater,Clothing,2,44.99,C010,East,Credit Card
+2024-01-08,Monitor,Electronics,1,299.99,C001,North,Credit Card
+2024-01-08,Plant Pot,Home & Garden,4,12.99,C006,East,Debit Card
+2024-01-09,Tennis Racket,Sports,1,129.99,C011,West,Credit Card
+2024-01-09,Tablet,Electronics,1,449.99,C012,South,PayPal
+2024-01-10,Jacket,Clothing,1,99.99,C003,East,Credit Card
+2024-01-10,Biography,Books,1,19.99,C013,North,Debit Card
+2024-01-11,Gaming Mouse,Electronics,1,59.99,C014,South,Credit Card
+2024-01-11,Yoga Mat,Sports,2,29.99,C015,West,PayPal
+2024-01-12,Cookbook,Books,2,24.99,C009,South,Credit Card
+2024-01-12,Bedsheets,Home & Garden,1,89.99,C016,East,Credit Card
+2024-01-13,Hoodie,Clothing,2,49.99,C017,North,Debit Card
+2024-01-13,Webcam,Electronics,1,79.99,C018,South,PayPal
+2024-01-14,Dumbbell Set,Sports,1,149.99,C019,West,Credit Card
+2024-01-14,Desk,Home & Garden,1,349.99,C020,East,Credit Card
+2024-01-15,Socks,Clothing,5,9.99,C021,North,Debit Card
+2024-01-15,USB Drive,Electronics,3,14.99,C022,South,PayPal
+
